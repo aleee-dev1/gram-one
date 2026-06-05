@@ -4,7 +4,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, "databases/main.db");
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, "../databases/main.db");
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
 let db;
