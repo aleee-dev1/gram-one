@@ -148,7 +148,7 @@ The goal is to keep the core lightweight while allowing capabilities to scale as
 ## Getting Started
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/aleee-dev1/gram-one
 cd gram-one
 
 npm install
