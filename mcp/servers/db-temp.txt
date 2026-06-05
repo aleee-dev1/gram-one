@@ -1,0 +1,287 @@
+// fs_mcp_server.js
+import fs from "fs/promises";
+import fssync from "fs";
+import path from "path";
+import { execFile } from "child_process";
+
+const ROOT = process.env.MCP_ROOT || process.cwd();
+const MAX_READ_SIZE = 2 * 1024 * 1024; // 2MB
+
+const SYMLINK_POLICY = "deny"; // deny | resolve
+
+function out(obj) {
+    process.stdout.write(JSON.stringify(obj) + "\n");
+}
+
+function safePath(p) {
+    const resolved = path.resolve(ROOT, p);
+    if (!resolved.startsWith(path.resolve(ROOT))) {
+        throw new Error("Path escapes sandbox");
+    }
+    return resolved;
+}
+
+async function statSafe(p) {
+    const rp = safePath(p);
+    const st = await fs.lstat(rp);
+    if (SYMLINK_POLICY === "deny" && st.isSymbolicLink()) {
+        throw new Error("Symlink denied");
+    }
+    return st;
+}
+
+function isBinary(buf) {
+    for (let i = 0; i < buf.length; i++) {
+        if (buf[i] === 0) return true;
+    }
+    return false;
+}
+
+async function run(cmd, args = []) {
+    return new Promise((resolve) => {
+        execFile(cmd, args, { maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
+            if (err) return resolve({ success: false, content: stderr || err.message });
+            resolve({ success: true, content: stdout.toString() });
+        });
+    });
+}
+
+// ---------- FS TOOLS ----------
+
+async function list({ path: p }) {
+    try {
+        const rp = safePath(p);
+        const items = await fs.readdir(rp, { withFileTypes: true });
+        return {
+            success: true, content: items.map(i => ({
+                name: i.name,
+                type: i.isDirectory() ? "dir" : i.isFile() ? "file" : "other"
+            }))
+        };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function read({ path: p, encoding = "utf8" }) {
+    try {
+        const rp = safePath(p);
+        const buf = await fs.readFile(rp);
+        if (buf.length > MAX_READ_SIZE) throw new Error("File too large");
+        if (isBinary(buf)) return { success: false, content: "Binary file blocked" };
+        return { success: true, content: buf.toString(encoding) };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function write({ path: p, data }) {
+    try {
+        const rp = safePath(p);
+        await fs.writeFile(rp, data);
+        return { success: true, content: "written" };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function append({ path: p, data }) {
+    try {
+        const rp = safePath(p);
+        await fs.appendFile(rp, data);
+        return { success: true, content: "appended" };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function mkdir({ path: p }) {
+    try {
+        await fs.mkdir(safePath(p), { recursive: true });
+        return { success: true, content: "created" };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function move({ from, to }) {
+    try {
+        await fs.rename(safePath(from), safePath(to));
+        return { success: true, content: "moved" };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function copy({ from, to }) {
+    try {
+        await fs.copyFile(safePath(from), safePath(to));
+        return { success: true, content: "copied" };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function del({ path: p }) {
+    try {
+        await fs.rm(safePath(p), { recursive: true, force: true });
+        return { success: true, content: "deleted" };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function stat({ path: p }) {
+    try {
+        const st = await statSafe(p);
+        return {
+            success: true, content: {
+                size: st.size,
+                isFile: st.isFile(),
+                isDir: st.isDirectory(),
+                mtime: st.mtime
+            }
+        };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function find({ path: p, name }) {
+    const base = safePath(p);
+    const res = [];
+    async function walk(dir) {
+        const items = await fs.readdir(dir, { withFileTypes: true });
+        for (const i of items) {
+            const fp = path.join(dir, i.name);
+            if (i.name.includes(name)) res.push(fp.replace(ROOT, ""));
+            if (i.isDirectory()) await walk(fp);
+        }
+    }
+    try {
+        await walk(base);
+        return { success: true, content: res };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function grep({ path: p, pattern }) {
+    return run("grep", ["-R", pattern, safePath(p)]);
+}
+
+async function hash({ path: p }) {
+    return run("sha256sum", [safePath(p)]);
+}
+
+async function permissions({ path: p }) {
+    try {
+        const st = await fs.stat(safePath(p));
+        return { success: true, content: (st.mode & 0o777).toString(8) };
+    } catch (e) {
+        return { success: false, content: e.message };
+    }
+}
+
+async function mounts() {
+    const result = await run("mount", []);
+
+    if (!result.success) {
+        return result;
+    }
+
+    const mounts = result.content
+        .trim()
+        .split("\n")
+        .map(line => {
+            const match = line.match(
+                /^(.+?) on (.+?) type (.+?) \((.+)\)$/
+            );
+
+            if (!match) return null;
+
+            const [, source, target, fsType, options] = match;
+
+            return {
+                source,
+                target,
+                fsType,
+                options: options.split(","),
+            };
+        })
+        .filter(Boolean);
+
+    return {
+        success: true,
+        content: mounts,
+    };
+}
+
+async function disk_usage() {
+    const result = await run("df", ["-h"]);
+
+    if (!result.success) {
+        return result;
+    }
+
+    const lines = result.content.trim().split("\n");
+
+    const disks = lines.slice(1).map(line => {
+        const parts = line.replace(/\s+/g, " ").split(" ");
+
+        return {
+            filesystem: parts[0],
+            size: parts[1],
+            used: parts[2],
+            available: parts[3],
+            usePercent: parts[4],
+            mountedOn: parts.slice(5).join(" "),
+        };
+    });
+
+    return {
+        success: true,
+        content: disks,
+    };
+}
+// ---------- ROUTER ----------
+
+const tools = {
+    "fs.list": list,
+    "fs.read": read,
+    "fs.write": write,
+    "fs.append": append,
+    "fs.mkdir": mkdir,
+    "fs.move": move,
+    "fs.copy": copy,
+    "fs.delete": del,
+    "fs.stat": stat,
+    "fs.find": find,
+    "fs.grep": grep,
+    "fs.hash": hash,
+    "fs.permissions": permissions,
+    "fs.mounts": mounts,
+    "fs.disk_usage": disk_usage
+};
+
+process.stdin.setEncoding("utf8");
+let buffer = "";
+
+process.stdin.on("data", async (chunk) => {
+    buffer += chunk;
+    let lines = buffer.split("\n");
+    buffer = lines.pop();
+
+    for (const line of lines) {
+        if (!line.trim()) continue;
+        try {
+            const msg = JSON.parse(line);
+            const fn = tools[msg.tool];
+            if (!fn) return out({ success: false, content: "Unknown tool" });
+            const res = await fn(msg.args || {});
+            out(res);
+        } catch (e) {
+            out({ success: false, content: e.message });
+        }
+    }
+});
