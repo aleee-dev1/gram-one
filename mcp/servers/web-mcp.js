@@ -16,7 +16,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
         {
             name: "search",
-            description: "Search using Tavily",
+            description: "Search internet for webpages",
             inputSchema: {
                 type: "object",
                 properties: {
@@ -32,7 +32,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
         {
             name: "scrape",
-            description: "Extract readable content from a URL via Tavily",
+            description: "Extract readable content from a URL",
             inputSchema: {
                 type: "object",
                 properties: {
