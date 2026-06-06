@@ -104,7 +104,7 @@ async function loadMcpServers() {
 async function loadConversations() {
     const convos = await api("/api/conversations");
     $("conv-list").innerHTML = "";
-    convos.forEach(renderConvItem);
+    [...convos].reverse().forEach(renderConvItem);
     return convos;
 }
 
@@ -252,7 +252,7 @@ function appendToolCallUI(container, tc, executed = false) {
         </div>
         <pre class="text-[13px] p-[12px] bg-[#ffffff] dark:bg-[#2f2f2f] border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[6px] font-mono whitespace-pre-wrap">${escapeHtml(tc.function.arguments)}</pre>
         ${executed ? '' : `
-        <div class="flex gap-[8px] action-buttons">
+        <div class="flex gap-[8px] action-buttons mt-[8px]">
             <button class="allow-btn px-[16px] py-[6px] bg-[#1a1a1a] dark:bg-[#e0e0e0] text-white dark:text-[#1a1a1a] rounded-[6px] text-[13px] font-medium cursor-pointer">Allow</button>
             <button class="deny-btn px-[16px] py-[6px] bg-[#e53e3e] dark:bg-[#da3633] text-white rounded-[6px] text-[13px] font-medium cursor-pointer">Deny</button>
         </div>`} `;
@@ -429,7 +429,10 @@ function confirmDelete() {
     const greeting = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
     $("greeting-text").innerHTML = `<i class="fa-solid fa-sun text-[#d97757] text-[28px] rotate-180"></i> ${greeting}`;
 
-    await Promise.all([loadProfiles(), loadModels(), loadMcpServers()]);
+    loadModels();
+    loadMcpServers();
+    await loadProfiles();
+    
     const convos = await loadConversations();
     if (!convos.length) setNewState();
     else selectConversation(convos[0].id, convos[0].title, convos[0].profile_id, convos[0].mcp_servers);

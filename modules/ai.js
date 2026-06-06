@@ -55,6 +55,7 @@ export async function extractFacts(userMessage) {
         return Array.isArray(parsed.facts) ? parsed.facts : [];
     } catch {
         return [];
+
     }
 }
 
