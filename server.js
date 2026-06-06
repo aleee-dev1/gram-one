@@ -11,8 +11,6 @@ import {
 import { initMcp, getTools, executeTool, getMcpServers } from "./modules/mcp-manager.js";
 
 const providers = {
-
-// Add a confirmation dialog before running tools
     mistral: {
         baseUrl: 'https://api.mistral.ai',
         key: process.env.MISTRAL_API_KEY

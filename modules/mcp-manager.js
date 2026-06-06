@@ -21,7 +21,7 @@ export async function initMcp() {
                     env: { ...process.env}
                 });
                 const client = new Client(
-                    { name: "mywebui", version: "1.0.0" },
+                    { name: "gram-one", version: "1.0.0" },
                     { capabilities: {} }
                 );
                 await client.connect(transport);
