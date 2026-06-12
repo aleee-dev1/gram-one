@@ -193,26 +193,49 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
             await saveMessage(convId, "user", message, 0, 0, { embedding: queryEmbedding });
         }
 
-        // build API messages (no embedding field sent to API)
-        const apiMessages = history.map(m => {
-            const msg = { role: m.role, content: m.content || "" };
-            if (m.tool_calls) msg.tool_calls = m.tool_calls;
-            if (m.tool_call_id) msg.tool_call_id = m.tool_call_id;
-            if (m.tool_name) msg.name = m.tool_name;
-            return msg;
-        });
-        if (message?.trim()) apiMessages.push({ role: "user", content: message });
-
-        // build system prompt with RAG context appended
         const conv = await getConversation(convId);
+        let apiMessages = [];
         let systemPrompt = "";
-        if (conv?.profile_id) {
-            const profile = await getProfile(conv.profile_id);
-            if (profile) systemPrompt = profile.system_prompt;
-        }
+        let mcpTools = [];
 
-        if (ragContext) {
-            systemPrompt = systemPrompt ? `${systemPrompt}\n\n${ragContext}` : ragContext;
+        if (isContinue) {
+            // Find the last user message
+            const lastUserMsg = [...history].reverse().find(m => m.role === 'user');
+            const userContent = lastUserMsg ? lastUserMsg.content : "N/A";
+
+            // Find recent tool results
+            const recentToolResults = [];
+            for (const m of [...history].reverse()) {
+                if (m.role === 'tool') recentToolResults.unshift(m);
+                else if (m.role === 'assistant' && m.tool_calls) break;
+            }
+            const toolOutputStr = recentToolResults.map(t => `${t.tool_name || 'Tool'} Output:\n${t.content}`).join("\n\n");
+
+            systemPrompt = "this is user question or prompt, you suggested tool call, this is tool result, now make next message telling user output of the tool how they asked";
+            apiMessages = [
+                { role: "user", content: `User Prompt: ${userContent}\n\nTool Result:\n${toolOutputStr}` }
+            ];
+        } else {
+            // build API messages (no embedding field sent to API)
+            apiMessages = history.map(m => {
+                const msg = { role: m.role, content: m.content || "" };
+                if (m.tool_calls) msg.tool_calls = m.tool_calls;
+                if (m.tool_call_id) msg.tool_call_id = m.tool_call_id;
+                if (m.tool_name) msg.name = m.tool_name;
+                return msg;
+            });
+            if (message?.trim()) apiMessages.push({ role: "user", content: message });
+
+            if (conv?.profile_id) {
+                const profile = await getProfile(conv.profile_id);
+                if (profile) systemPrompt = profile.system_prompt;
+            }
+
+            if (ragContext) {
+                systemPrompt = systemPrompt ? `${systemPrompt}\n\n${ragContext}` : ragContext;
+            }
+
+            mcpTools = await getTopTools(queryEmbedding, conv?.mcp_servers, 5);
         }
 
         let aborted = false;
@@ -221,8 +244,6 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
         let fullContent = "";
         let usage = null;
         let toolCallsAcc = [];
-
-        const mcpTools = await getTopTools(queryEmbedding, conv?.mcp_servers, 5);
 
         for await (const chunk of streamChat(apiMessages, model, systemPrompt, mcpTools)) {
             if (aborted) break;

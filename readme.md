@@ -169,6 +169,11 @@ New features and modules are added incrementally while maintaining a lightweight
 
 ---
 
+## Caution
+Some MCP servers like apt-mcp, ssh-mcp, shell-mcp can do irreversible system damage, that is why each tool call needs approval, please be caucious and check params before running a tool
+
+---
+
 ## License
 
 MIT
