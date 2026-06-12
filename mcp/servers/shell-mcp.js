@@ -25,7 +25,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         tools: [
             {
                 name: "run",
-                description: "Run shell command",
+                description: "Execute arbitrary shell commands in a Linux terminal environment. Supports file management, process control, package installation, system diagnostics, networking commands, development tools, scripting, and automation workflows. Returns stdout, stderr, execution status, and command results. Use for terminal operations, system administration, troubleshooting, and command-line task execution.",
                 inputSchema: {
                     type: "object",
                     properties: {

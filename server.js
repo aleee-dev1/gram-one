@@ -181,9 +181,9 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
                 getAllFacts()
             ]);
 
-            const factBlock = facts.length ? "Known facts about the user:\n" + facts.map(f => `- ${f.fact}`).join("\n"): "";
+            const factBlock = facts.length ? "Known facts about the user:\n" + facts.map(f => `- ${f.fact}`).join("\n") : "";
 
-            const msgBlock = relevantMessages.length ? "Relevant conversation context:\n" + relevantMessages.map(r => `[${r.role}]: ${r.content}`).join("\n"): "";
+            const msgBlock = relevantMessages.length ? "Relevant conversation context:\n" + relevantMessages.map(r => `[${r.role}]: ${r.content}`).join("\n") : "";
 
             ragContext = [factBlock, msgBlock].filter(Boolean).join("\n\n");
         }
@@ -211,19 +211,6 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
             if (profile) systemPrompt = profile.system_prompt;
         }
 
-        const modeInstruction = `\n\nSYSTEM MODE DIRECTIVE:
-You are a dual-mode system.
-- If the user's request is simple or requires only a single tool call, act as an ASSISTANT: respond normally and issue the single tool call if needed.
-- If the user's request is complex and requires multiple steps and tools, act as an AGENT:
-  1. Formulate a step-by-step plan and ask the user to approve it.
-  2. DO NOT call any tools until the user explicitly approves the plan.
-  3. Once approved, execute the steps one by one. Issue ONE tool call at a time. The user will confirm the execution.
-  4. After receiving the tool result, proceed to execute the next tool in your plan.
-  5. Continue executing tools sequentially until the plan is complete.
-  6. Provide a final summary of the results.`;
-
-        systemPrompt = systemPrompt ? `${systemPrompt}\n${modeInstruction}` : modeInstruction;
-
         if (ragContext) {
             systemPrompt = systemPrompt ? `${systemPrompt}\n\n${ragContext}` : ragContext;
         }
@@ -235,27 +222,27 @@ You are a dual-mode system.
         let usage = null;
         let toolCallsAcc = [];
 
-        const mcpTools = await getTopTools(queryEmbedding, conv?.mcp_servers, 6);
+        const mcpTools = await getTopTools(queryEmbedding, conv?.mcp_servers, 5);
 
         for await (const chunk of streamChat(apiMessages, model, systemPrompt, mcpTools)) {
-                if (aborted) break;
-                if (chunk.type === "delta") {
-                    fullContent += chunk.content;
-                    send({ type: "delta", content: chunk.content });
-                } else if (chunk.type === "tool_calls") {
-                    for (const tc of chunk.tool_calls) {
-                        let acc = toolCallsAcc.find(t => t.index === tc.index);
-                        if (!acc) {
-                            acc = { index: tc.index, id: tc.id, type: "function", function: { name: tc.function?.name || "", arguments: "" } };
-                            toolCallsAcc.push(acc);
-                        }
-                        if (tc.function?.arguments) acc.function.arguments += tc.function.arguments;
+            if (aborted) break;
+            if (chunk.type === "delta") {
+                fullContent += chunk.content;
+                send({ type: "delta", content: chunk.content });
+            } else if (chunk.type === "tool_calls") {
+                for (const tc of chunk.tool_calls) {
+                    let acc = toolCallsAcc.find(t => t.index === tc.index);
+                    if (!acc) {
+                        acc = { index: tc.index, id: tc.id, type: "function", function: { name: tc.function?.name || "", arguments: "" } };
+                        toolCallsAcc.push(acc);
                     }
-                } else if (chunk.type === "usage") {
-                    usage = chunk;
-                    send({ type: "usage", prompt_tokens: chunk.prompt_tokens, completion_tokens: chunk.completion_tokens });
+                    if (tc.function?.arguments) acc.function.arguments += tc.function.arguments;
                 }
+            } else if (chunk.type === "usage") {
+                usage = chunk;
+                send({ type: "usage", prompt_tokens: chunk.prompt_tokens, completion_tokens: chunk.completion_tokens });
             }
+        }
 
         if (!aborted && fullContent && toolCallsAcc.length === 0) {
             const assistantEmb = await embedText(fullContent);

@@ -69,6 +69,8 @@ export async function* streamChat(messages, model, systemPrompt, tools = null) {
     if (tools?.length > 0) body.tools = tools;
 
     console.log('body start');
+    console.log(messages);
+    console.log(systemPrompt);
     tools.forEach(t => console.log(t.function.name));
     console.log('body end');
 

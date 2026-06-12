@@ -163,7 +163,7 @@ export async function saveMessage(convId, role, content, promptTokens, completio
         `INSERT INTO messages (conversation_id, role, content, tool_calls, tool_call_id, tool_name, prompt_tokens, completion_tokens, embedding)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [convId, role, content || "", tool_calls, extra.tool_call_id || null, extra.tool_name || null,
-         promptTokens || 0, completionTokens || 0, embedding]
+            promptTokens || 0, completionTokens || 0, embedding]
     );
     await run("UPDATE conversations SET updated_at = unixepoch() WHERE id = ?", [convId]);
     return result.lastID;
@@ -259,7 +259,7 @@ export async function saveMcpTool(serverName, toolName, description, parameters,
     );
 }
 
-export async function getTopTools(queryEmbedding, allowedServers, topK = 6) {
+export async function getTopTools(queryEmbedding, allowedServers, topK = 5) {
     const rows = await all("SELECT server_name, tool_name, description, parameters, embedding FROM mcp_tools");
     const parsed = rows.map(r => ({ ...r, embedding: JSON.parse(r.embedding) }));
     const filtered = allowedServers ? parsed.filter(r => allowedServers.includes(r.server_name)) : parsed;
@@ -267,11 +267,30 @@ export async function getTopTools(queryEmbedding, allowedServers, topK = 6) {
         type: "function",
         function: { name: `${r.server_name}__${r.tool_name}`, description: r.description, parameters: JSON.parse(r.parameters) }
     }));
-    const scored = filtered.map(r => ({ ...r, score: cosine(queryEmbedding, r.embedding) }))
-                           .sort((a, b) => b.score - a.score)
-                           .slice(0, topK);
-    return scored.map(r => ({
+    const threshold = 0.60;
+    const scored = filtered
+        .map(r => ({
+            ...r,
+            score: cosine(queryEmbedding, r.embedding)
+        }))
+        .filter(r => r.score >= threshold)
+        .sort((a, b) => b.score - a.score);
+
+    console.log("\nTool ranking:");
+    for (const t of scored.slice(0, 20)) {
+        console.log(
+            `${t.score.toFixed(2)}  ${t.server_name}__${t.tool_name}`
+        );
+    }
+
+    const top = scored.slice(0, topK);
+
+    return top.map(r => ({
         type: "function",
-        function: { name: `${r.server_name}__${r.tool_name}`, description: r.description, parameters: JSON.parse(r.parameters) }
+        function: {
+            name: `${r.server_name}__${r.tool_name}`,
+            description: r.description,
+            parameters: JSON.parse(r.parameters)
+        }
     }));
 }

@@ -16,7 +16,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
         {
             name: "search",
-            description: "Search internet for webpages",
+            description: "Search the internet for current information, webpages, articles, documentation, tutorials, blogs, forums, repositories, products, companies, services, and online resources using keyword queries. Returns relevant search results for web research, fact-checking, troubleshooting, source discovery, and information gathering.",
             inputSchema: {
                 type: "object",
                 properties: {
@@ -32,7 +32,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
         {
             name: "scrape",
-            description: "Extract readable content from a URL",
+            description: "Extract readable content from a webpage URL by removing navigation, ads, styling, and page clutter. Returns the main article text, documentation content, blog post, guide, reference material, or webpage body in a clean format. Useful for content analysis, summarization, research, knowledge extraction, and question answering from web sources.",
             inputSchema: {
                 type: "object",
                 properties: {

@@ -21,7 +21,7 @@ function text(obj) {
 
 const TOOLS = {
     "apt.search": {
-        description: "Search for packages in apt-cache",
+        description: "Search Debian and Ubuntu APT repositories using apt-cache. Finds packages by name, feature, keyword, library, application, development tool, driver, or service. Returns matching package names with short descriptions. Useful for package discovery, software lookup, and dependency research.",
         inputSchema: {
             type: "object",
             properties: { query: { type: "string" } },
@@ -39,7 +39,7 @@ const TOOLS = {
     },
 
     "apt.info": {
-        description: "Show apt-cache info for a package",
+        description: "Retrieve detailed package metadata from APT repositories using apt-cache show. Returns version information, dependencies, maintainer details, package size, architecture, repository source, and package description. Useful for package inspection, dependency analysis, and installation planning.",
         inputSchema: {
             type: "object",
             properties: { package: { type: "string" } },
@@ -52,7 +52,7 @@ const TOOLS = {
     },
 
     "apt.installed": {
-        description: "List installed packages, optionally filtered by name",
+        description: "List packages currently installed on the system using dpkg. Can return all installed packages or filter by package name. Includes package version and architecture information. Useful for inventory auditing, package verification, and dependency troubleshooting.",
         inputSchema: {
             type: "object",
             properties: { package: { type: "string" } },
@@ -71,7 +71,7 @@ const TOOLS = {
     },
 
     "apt.install": {
-        description: "Install a package via apt-get",
+        description: "Install packages from configured APT repositories using apt-get install. Supports automatic confirmation and dependency resolution. Returns installation output and package manager messages. Useful for software deployment, package provisioning, and system setup automation.",
         inputSchema: {
             type: "object",
             properties: {
@@ -90,7 +90,7 @@ const TOOLS = {
     },
 
     "apt.remove": {
-        description: "Remove or purge a package via apt-get",
+        description: "Remove or purge installed packages using apt-get remove or purge. Supports configuration cleanup and automatic confirmation. Returns package manager output and removal status. Useful for software uninstallation, system cleanup, and package lifecycle management.",
         inputSchema: {
             type: "object",
             properties: {
@@ -110,7 +110,7 @@ const TOOLS = {
     },
 
     "apt.update": {
-        description: "Run apt-get update",
+        description: "Refresh the local APT package index from configured repositories. Downloads the latest package metadata, repository information, and available version updates. Returns update operation output. Useful before package installation, upgrades, and repository synchronization.",
         inputSchema: { type: "object", properties: {}, required: [] },
         async handler() {
             const { stdout, stderr } = await run("sudo", ["apt-get", "update"]);
@@ -119,7 +119,7 @@ const TOOLS = {
     },
 
     "apt.upgrade": {
-        description: "Run apt-get upgrade",
+        description: "Upgrade installed packages to the latest available versions from configured repositories. Resolves package updates while preserving installed software. Returns upgrade progress and package manager output. Useful for system maintenance, security updates, and software lifecycle management.",
         inputSchema: {
             type: "object",
             properties: { assumeYes: { type: "boolean", default: true } },
@@ -134,7 +134,7 @@ const TOOLS = {
     },
 
     "apt.autoremove": {
-        description: "Run apt-get autoremove",
+        description: "Remove unused packages and orphaned dependencies no longer required by installed software. Frees disk space and cleans package relationships automatically. Returns package manager output and removal details. Useful for system maintenance, dependency cleanup, and package housekeeping.",
         inputSchema: {
             type: "object",
             properties: { assumeYes: { type: "boolean", default: true } },
@@ -149,7 +149,7 @@ const TOOLS = {
     },
 
     "apt.listUpgradable": {
-        description: "List upgradable packages",
+        description: "List installed packages that have newer versions available in configured repositories. Returns package names, upgrade information, and current version references. Useful for update planning, system auditing, and package maintenance workflows.",
         inputSchema: { type: "object", properties: {}, required: [] },
         async handler() {
             const { stdout } = await run("apt", ["list", "--upgradable"]);
@@ -166,7 +166,7 @@ const TOOLS = {
     },
 
     "apt.clean": {
-        description: "Run apt-get clean",
+        description: "Clear the local APT package cache and downloaded package archives. Removes cached installation files without affecting installed software. Returns package manager output. Useful for disk space recovery, cache maintenance, and repository housekeeping.",
         inputSchema: { type: "object", properties: {}, required: [] },
         async handler() {
             const { stdout, stderr } = await run("sudo", ["apt-get", "clean"]);
