@@ -64,6 +64,25 @@ export function initDb() {
                     )
                 `);
 
+                db.run(`
+                    CREATE TABLE IF NOT EXISTS mcp_servers_meta (
+                        server_name TEXT PRIMARY KEY,
+                        shasum TEXT
+                    )
+                `);
+
+                db.run(`
+                    CREATE TABLE IF NOT EXISTS mcp_tools (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        server_name TEXT,
+                        tool_name TEXT,
+                        description TEXT,
+                        parameters TEXT,
+                        embedding TEXT,
+                        UNIQUE(server_name, tool_name)
+                    )
+                `);
+
                 db.run("INSERT OR IGNORE INTO profiles (id, name, system_prompt) VALUES (1, 'Mr Daniel', 'You are a helpful assistant')", resolve);
             });
         });
@@ -217,4 +236,42 @@ export function updateProfile(id, name, systemPrompt) {
 
 export function deleteProfile(id) {
     return run("DELETE FROM profiles WHERE id = ?", [id]);
+}
+
+// ── mcp ───────────────────────────────────────────────────────────────────────
+
+export async function getMcpServerMeta(serverName) {
+    return get("SELECT shasum FROM mcp_servers_meta WHERE server_name = ?", [serverName]);
+}
+
+export async function updateMcpServerMeta(serverName, shasum) {
+    return run("INSERT OR REPLACE INTO mcp_servers_meta (server_name, shasum) VALUES (?, ?)", [serverName, shasum]);
+}
+
+export async function clearMcpTools(serverName) {
+    return run("DELETE FROM mcp_tools WHERE server_name = ?", [serverName]);
+}
+
+export async function saveMcpTool(serverName, toolName, description, parameters, embedding) {
+    return run(
+        "INSERT INTO mcp_tools (server_name, tool_name, description, parameters, embedding) VALUES (?, ?, ?, ?, ?)",
+        [serverName, toolName, description, JSON.stringify(parameters), JSON.stringify(embedding)]
+    );
+}
+
+export async function getTopTools(queryEmbedding, allowedServers, topK = 6) {
+    const rows = await all("SELECT server_name, tool_name, description, parameters, embedding FROM mcp_tools");
+    const parsed = rows.map(r => ({ ...r, embedding: JSON.parse(r.embedding) }));
+    const filtered = allowedServers ? parsed.filter(r => allowedServers.includes(r.server_name)) : parsed;
+    if (!queryEmbedding) return filtered.slice(0, topK).map(r => ({
+        type: "function",
+        function: { name: `${r.server_name}__${r.tool_name}`, description: r.description, parameters: JSON.parse(r.parameters) }
+    }));
+    const scored = filtered.map(r => ({ ...r, score: cosine(queryEmbedding, r.embedding) }))
+                           .sort((a, b) => b.score - a.score)
+                           .slice(0, topK);
+    return scored.map(r => ({
+        type: "function",
+        function: { name: `${r.server_name}__${r.tool_name}`, description: r.description, parameters: JSON.parse(r.parameters) }
+    }));
 }

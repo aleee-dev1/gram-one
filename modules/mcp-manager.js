@@ -1,8 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
+import crypto from "crypto";
 import { fileURLToPath } from "url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { getMcpServerMeta, updateMcpServerMeta, clearMcpTools, saveMcpTool } from "./db.js";
+import { embedText } from "./ai.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const mcpDir = path.join(__dirname, "../mcp/servers");
@@ -28,6 +31,21 @@ export async function initMcp() {
                 const serverName = file.replace(".js", "");
                 clients[serverName] = client;
                 console.log(`Loaded MCP server: ${file}`);
+                
+                const content = await fs.readFile(path.join(mcpDir, file), "utf-8");
+                const hash = crypto.createHash("sha256").update(content).digest("hex");
+                const meta = await getMcpServerMeta(serverName);
+                if (!meta || meta.shasum !== hash) {
+                    console.log(`Updating tools for ${serverName}`);
+                    await clearMcpTools(serverName);
+                    const res = await client.listTools();
+                    for (const tool of res.tools) {
+                        const details = `${tool.name}: ${tool.description}`;
+                        const embedding = await embedText(details);
+                        await saveMcpTool(serverName, tool.name, tool.description, tool.inputSchema || { type: "object", properties: {} }, embedding);
+                    }
+                    await updateMcpServerMeta(serverName, hash);
+                }
             }
         }
     } catch (err) {

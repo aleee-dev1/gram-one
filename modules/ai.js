@@ -68,6 +68,10 @@ export async function* streamChat(messages, model, systemPrompt, tools = null) {
     const body = { model: selectedModel, stream: true, messages: apiMessages };
     if (tools?.length > 0) body.tools = tools;
 
+    console.log('body start');
+    tools.forEach(t => console.log(t.function.name));
+    console.log('body end');
+
     const res = await fetch(MISTRAL_BASE + '/v1/chat/completions', {
         method: "POST",
         headers: headers(),

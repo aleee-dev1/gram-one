@@ -6,7 +6,7 @@ import {
     saveMessage, getMessages, getConversation, getProfile, initDb,
     getRelevantMessages, getAllFacts, saveFacts, updateConversationTitle,
     getProfiles, createProfile, updateProfile, deleteProfile,
-    getConversations, createConversation, deleteConversation
+    getConversations, createConversation, deleteConversation, getTopTools
 } from "./modules/db.js";
 import { initMcp, getTools, executeTool, getMcpServers } from "./modules/mcp-manager.js";
 
@@ -235,7 +235,7 @@ You are a dual-mode system.
         let usage = null;
         let toolCallsAcc = [];
 
-        const mcpTools = await getTools(conv?.mcp_servers);
+        const mcpTools = await getTopTools(queryEmbedding, conv?.mcp_servers, 6);
 
         for await (const chunk of streamChat(apiMessages, model, systemPrompt, mcpTools)) {
                 if (aborted) break;
@@ -360,7 +360,8 @@ app.post("/api/conversations/:id/execute_tool", async (req, res) => {
     }
 });
 
-Promise.all([initDb(), initMcp()])
+initDb()
+    .then(() => initMcp())
     .then(() => {
         // console.clear();
         console.log('   GRAM ONE');
