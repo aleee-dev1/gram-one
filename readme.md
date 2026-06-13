@@ -76,6 +76,8 @@ https://github.com/aleee-dev1/mcp-servers
 
 The architecture is designed to remain flexible and should work with other MCP servers as well.
 
+MCP Servers are embedded and saved in Databse and are dynamically injected with prompts with RAG
+
 ---
 
 ### Live Token Usage
@@ -123,13 +125,16 @@ Every component is designed with future expansion in mind, allowing the project 
 
 Potential future expansions include:
 
-* Full long-term memory systems
-* Agent loops
-* Multi-agent workflows
-* Advanced knowledge management
-* Improved retrieval systems
-* Custom plugin ecosystem
-* Enhanced automation capabilities
+* Full Long-term Memory System
+* Agent Loops
+* Advanced Context Management
+* Chroma DB for vector storage
+* Presistent Terminal MCP
+* File & Photo upload support
+* Provider Manager UI
+* Improved Retrieval System
+* Polished profile UI
+* Conversation Params UI
 
 The goal is to keep the core lightweight while allowing capabilities to scale as needed.
 
@@ -137,10 +142,11 @@ The goal is to keep the core lightweight while allowing capabilities to scale as
 
 ## Technology
 
-* Node.js
-* SQLite
-* Retrieval-Augmented Generation (RAG)
-* MCP (Model Context Protocol)
+* Node.js with Express as Backend Server
+* Tailwind CSS for rapid frontend ui so I don't spend hours centering divs
+* SQLite as Database for Data Storage and Retrieval-Augmented Generation
+* Tavily for Scraping Content from Webpages
+* Extendable MCP Servers (Model Context Protocol)
 * Modular provider architecture
 
 ---
