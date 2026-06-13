@@ -4,25 +4,7 @@ const headers = () => ({
     Authorization: `Bearer ${process.env.MISTRAL_API_KEY}`
 });
 
-const FACT_EXTRACTION_PROMPT = `You are a fact extractor. Respond ONLY in this JSON format:
-{"facts": ["fact1", "fact2"]}
 
-Extract facts ONLY if explicitly stated by the user in their message.
-Write each fact as a full declarative sentence e.g. "The user's name is Stark", "The user's keys are under the bed".
-Only extract durable, reusable facts:
-- Personal identity: name, age, location, occupation
-- Owned objects and where they are
-- Stated preferences, habits, or routines
-- Explicit relationships: family, friends, colleagues
-
-Do NOT extract:
-- Emotions, moods, or temporary states
-- Opinions or subjective statements
-- Questions or hypotheticals
-- Anything implicit or inferred
-- Facts from your own response, only from the user message
-
-If nothing qualifies, return {"facts": []}.`;
 
 export async function embedText(text) {
     const res = await fetch(MISTRAL_BASE + '/v1/embeddings', {
@@ -34,30 +16,7 @@ export async function embedText(text) {
     return (await res.json()).data[0].embedding;
 }
 
-export async function extractFacts(userMessage) {
-    const res = await fetch(MISTRAL_BASE + '/v1/chat/completions', {
-        method: "POST",
-        headers: headers(),
-        body: JSON.stringify({
-            model: "mistral-small-latest",
-            max_tokens: 512,
-            response_format: { type: "json_object" },
-            messages: [
-                { role: "system", content: FACT_EXTRACTION_PROMPT },
-                { role: "user", content: userMessage }
-            ]
-        })
-    });
-    if (!res.ok) throw new Error(`Facts error ${res.status}: ${await res.text()}`);
-    const data = await res.json();
-    try {
-        const parsed = JSON.parse(data.choices[0].message.content);
-        return Array.isArray(parsed.facts) ? parsed.facts : [];
-    } catch {
-        return [];
 
-    }
-}
 
 export async function* streamChat(messages, model, systemPrompt, tools = null) {
     const selectedModel = model || process.env.MISTRAL_MODEL || "mistral-small-latest";

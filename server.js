@@ -1,10 +1,10 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { embedText, extractFacts, streamChat } from "./modules/ai.js";
+import { embedText, streamChat } from "./modules/ai.js";
 import {
     saveMessage, getMessages, getConversation, getProfile, initDb,
-    getRelevantMessages, getAllFacts, saveFacts, updateConversationTitle,
+    getRelevantMessages, updateConversationTitle,
     getProfiles, createProfile, updateProfile, deleteProfile,
     getConversations, createConversation, deleteConversation, getTopTools
 } from "./modules/db.js";
@@ -176,16 +176,11 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
         if (message?.trim()) {
             queryEmbedding = await embedText(message);
 
-            const [relevantMessages, facts] = await Promise.all([
-                getRelevantMessages(convId, queryEmbedding),
-                getAllFacts()
-            ]);
-
-            const factBlock = facts.length ? "Known facts about the user:\n" + facts.map(f => `- ${f.fact}`).join("\n") : "";
+            const relevantMessages = await getRelevantMessages(convId, queryEmbedding);
 
             const msgBlock = relevantMessages.length ? "Relevant conversation context:\n" + relevantMessages.map(r => `[${r.role}]: ${r.content}`).join("\n") : "";
 
-            ragContext = [factBlock, msgBlock].filter(Boolean).join("\n\n");
+            ragContext = [msgBlock].filter(Boolean).join("\n\n");
         }
 
         // save user message with embedding
@@ -276,20 +271,7 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
             send({ type: "tool_calls", tool_calls });
         }
 
-        // extract facts from user message asynchronously after streaming
-        if (!aborted && message?.trim()) {
-            try {
-                const rawFacts = await extractFacts(message);
-                if (rawFacts.length > 0) {
-                    const saved = await saveFacts(rawFacts, embedText);
-                    if (saved.length > 0) {
-                        send({ type: "facts", facts: saved });
-                    }
-                }
-            } catch (err) {
-                console.error("Fact extraction failed:", err.message);
-            }
-        }
+
 
         if (!aborted) send({ type: "done" });
 

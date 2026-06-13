@@ -55,14 +55,7 @@ export function initDb() {
 
                 db.run(`CREATE INDEX IF NOT EXISTS idx_messages_conv ON messages(conversation_id)`);
 
-                db.run(`
-                    CREATE TABLE IF NOT EXISTS facts (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        fact TEXT NOT NULL,
-                        embedding TEXT NOT NULL,
-                        created_at INTEGER NOT NULL DEFAULT (unixepoch())
-                    )
-                `);
+
 
                 db.run(`
                     CREATE TABLE IF NOT EXISTS mcp_servers_meta (
@@ -189,28 +182,7 @@ export async function getRelevantMessages(convId, queryEmbedding, topK = 3, rece
     return [...recent, ...topSimilar];
 }
 
-// ── RAG: facts ────────────────────────────────────────────────────────────────
 
-export async function getAllFacts() {
-    return all("SELECT id, fact FROM facts ORDER BY created_at ASC");
-}
-
-export async function saveFacts(facts, embedFn) {
-    const existing = await all("SELECT fact, embedding FROM facts");
-    const parsed = existing.map(r => ({ ...r, embedding: JSON.parse(r.embedding) }));
-    const saved = [];
-
-    for (const fact of facts) {
-        const emb = await embedFn(fact);
-        const duplicate = parsed.some(r => cosine(emb, r.embedding) > 0.95);
-        if (!duplicate) {
-            await run("INSERT INTO facts (fact, embedding) VALUES (?, ?)", [fact, JSON.stringify(emb)]);
-            parsed.push({ fact, embedding: emb });
-            saved.push(fact);
-        }
-    }
-    return saved;
-}
 
 // ── profiles ──────────────────────────────────────────────────────────────────
 
