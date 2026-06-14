@@ -142,11 +142,15 @@ export function deleteConversation(convId) {
 
 export async function getMessages(convId) {
     const rows = await all(
-        `SELECT id, role, content, tool_calls, tool_call_id, tool_name, prompt_tokens, completion_tokens, created_at
+        `SELECT id, role, content, tool_calls, tool_call_id, tool_name, prompt_tokens, completion_tokens, embedding, created_at
          FROM messages WHERE conversation_id = ? ORDER BY created_at ASC, id ASC`,
         [convId]
     );
-    return rows.map(r => { if (r.tool_calls) r.tool_calls = JSON.parse(r.tool_calls); return r; });
+    return rows.map(r => { 
+        if (r.tool_calls) r.tool_calls = JSON.parse(r.tool_calls); 
+        if (r.embedding) r.embedding = JSON.parse(r.embedding);
+        return r; 
+    });
 }
 
 export async function saveMessage(convId, role, content, promptTokens, completionTokens, extra = {}) {
@@ -164,7 +168,7 @@ export async function saveMessage(convId, role, content, promptTokens, completio
 
 // ── RAG: messages ─────────────────────────────────────────────────────────────
 
-export async function getRelevantMessages(convId, queryEmbedding, topK = 3, recentK = 4) {
+export async function getRelevantMessages(convId, queryEmbedding, topK = 5, recentK = 3) {
     const rows = await all(
         `SELECT id, role, content, embedding FROM messages
          WHERE conversation_id = ? AND embedding IS NOT NULL AND role IN ('user', 'assistant')
@@ -179,7 +183,7 @@ export async function getRelevantMessages(convId, queryEmbedding, topK = 3, rece
         .map(r => ({ ...r, score: cosine(queryEmbedding, r.embedding) }))
         .sort((a, b) => b.score - a.score)
         .slice(0, topK);
-    return [...recent, ...topSimilar];
+    return topSimilar;
 }
 
 

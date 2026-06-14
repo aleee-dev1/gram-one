@@ -178,6 +178,10 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
 
             const relevantMessages = await getRelevantMessages(convId, queryEmbedding);
 
+            console.log('----------------- raw relevant messages');
+
+            console.log(relevantMessages)
+
             const msgBlock = relevantMessages.length ? "Relevant conversation context:\n" + relevantMessages.map(r => `[${r.role}]: ${r.content}`).join("\n") : "";
 
             ragContext = [msgBlock].filter(Boolean).join("\n\n");
@@ -212,7 +216,7 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
             ];
         } else {
             // build API messages (no embedding field sent to API)
-            apiMessages = history.map(m => {
+            apiMessages = history.slice(-3).map(m => {
                 const msg = { role: m.role, content: m.content || "" };
                 if (m.tool_calls) msg.tool_calls = m.tool_calls;
                 if (m.tool_call_id) msg.tool_call_id = m.tool_call_id;
@@ -270,8 +274,6 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
             await saveMessage(convId, "assistant", fullContent, usage?.prompt_tokens ?? 0, usage?.completion_tokens ?? 0, { tool_calls });
             send({ type: "tool_calls", tool_calls });
         }
-
-
 
         if (!aborted) send({ type: "done" });
 

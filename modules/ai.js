@@ -27,6 +27,8 @@ export async function* streamChat(messages, model, systemPrompt, tools = null) {
     const body = { model: selectedModel, stream: true, messages: apiMessages };
     if (tools?.length > 0) body.tools = tools;
 
+    console.log('------------ sys & rag')
+    console.log(systemPrompt)
     console.log(' ----------- messages start ------------');
     console.log(messages);
     console.log(' ----------- messages end ------------');
