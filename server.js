@@ -6,20 +6,10 @@ import {
     saveMessage, getMessages, getConversation, getProfile, initDb,
     getRelevantMessages, updateConversationTitle,
     getProfiles, createProfile, updateProfile, deleteProfile,
-    getConversations, createConversation, deleteConversation, getTopTools
+    getConversations, createConversation, deleteConversation, getTopTools,
+    getConfig, updateConfig
 } from "./modules/db.js";
 import { initMcp, getTools, executeTool, getMcpServers } from "./modules/mcp-manager.js";
-
-const providers = {
-    mistral: {
-        baseUrl: 'https://api.mistral.ai',
-        key: process.env.MISTRAL_API_KEY
-    },
-    lmStudio: {
-        baseUrl: 'http://127.0.0.1:1234',
-        key: process.env.LMSTUDIO_KEY
-    }
-};
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -33,11 +23,53 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public/index/index.html"));
 });
 
+app.use("/config", express.static(path.join(__dirname, "public/config")));
+app.get("/config", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/config/index.html"));
+});
+
+// --- Config ---
+app.get("/api/config", async (req, res) => {
+    try {
+        const config = await getConfig();
+        res.json(config || { base_url: "", api_key: "" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post("/api/config", async (req, res) => {
+    try {
+        const { baseUrl, apiKey } = req.body;
+        if (!baseUrl || !apiKey) return res.status(400).json({ success: false, error: "Missing baseUrl or apiKey" });
+        
+        // Test fetching models to verify
+        const r = await fetch(baseUrl + "/v1/models", {
+            headers: { Authorization: `Bearer ${apiKey}` }
+        });
+        
+        if (!r.ok) {
+            throw new Error(`Failed to fetch models: ${r.status} ${await r.text()}`);
+        }
+        
+        await updateConfig(baseUrl, apiKey);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+});
+
+
 // --- Models ---
 app.get("/api/models", async (req, res) => {
     try {
-        const r = await fetch(providers.mistral.baseUrl + "/v1/models", {
-            headers: { Authorization: `Bearer ${providers.mistral.key}` }
+        const config = await getConfig();
+        if (!config || !config.base_url || !config.api_key) {
+            throw new Error("Provider not configured");
+        }
+
+        const r = await fetch(config.base_url + "/v1/models", {
+            headers: { Authorization: `Bearer ${config.api_key}` }
         });
         if (!r.ok) throw new Error(`Models API: ${r.status}`);
         const data = await r.json();

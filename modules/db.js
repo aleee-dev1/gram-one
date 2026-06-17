@@ -76,6 +76,18 @@ export function initDb() {
                     )
                 `);
 
+                db.run(`
+                    CREATE TABLE IF NOT EXISTS config (
+                        id INTEGER PRIMARY KEY CHECK (id = 1),
+                        base_url TEXT NOT NULL,
+                        api_key TEXT NOT NULL
+                    )
+                `);
+
+                db.run("INSERT OR IGNORE INTO config (id, base_url, api_key) VALUES (1, ?, ?)", [
+                    'https://api.mistral.ai', process.env.MISTRAL_API_KEY || ''
+                ]);
+                
                 db.run("INSERT OR IGNORE INTO profiles (id, name, system_prompt) VALUES (1, 'Mr Daniel', 'You are a helpful assistant')", resolve);
             });
         });
@@ -106,6 +118,16 @@ function cosine(a, b) {
     const dot = a.reduce((s, v, i) => s + v * b[i], 0);
     const mag = v => Math.sqrt(v.reduce((s, x) => s + x * x, 0));
     return dot / (mag(a) * mag(b));
+}
+
+// ── config ────────────────────────────────────────────────────────────────────
+
+export function getConfig() {
+    return get("SELECT base_url, api_key FROM config WHERE id = 1");
+}
+
+export function updateConfig(baseUrl, apiKey) {
+    return run("UPDATE config SET base_url = ?, api_key = ? WHERE id = 1", [baseUrl, apiKey]);
 }
 
 // ── conversations ─────────────────────────────────────────────────────────────

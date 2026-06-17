@@ -1,15 +1,17 @@
-const MISTRAL_BASE = 'https://api.mistral.ai';
-const headers = () => ({
+import { getConfig } from "./db.js";
+
+const headers = (apiKey) => ({
     "Content-Type": "application/json",
-    Authorization: `Bearer ${process.env.MISTRAL_API_KEY}`
+    Authorization: `Bearer ${apiKey}`
 });
 
-
-
 export async function embedText(text) {
-    const res = await fetch(MISTRAL_BASE + '/v1/embeddings', {
+    const config = await getConfig();
+    if (!config) throw new Error("AI provider config not set");
+    
+    const res = await fetch(config.base_url + '/v1/embeddings', {
         method: "POST",
-        headers: headers(),
+        headers: headers(config.api_key),
         body: JSON.stringify({ model: "mistral-embed", input: [text] })
     });
     if (!res.ok) throw new Error(`Embed error ${res.status}: ${await res.text()}`);
@@ -17,8 +19,10 @@ export async function embedText(text) {
 }
 
 
-
 export async function* streamChat(messages, model, systemPrompt, tools = null) {
+    const config = await getConfig();
+    if (!config) throw new Error("AI provider config not set");
+
     const selectedModel = model || process.env.MISTRAL_MODEL || "mistral-small-latest";
 
     const apiMessages = [...messages];
@@ -33,12 +37,12 @@ export async function* streamChat(messages, model, systemPrompt, tools = null) {
     console.log(messages);
     console.log(' ----------- messages end ------------');
     console.log(' ------------------- tools --------------')
-    tools.forEach(t => console.log(t.function.name));
+    tools?.forEach(t => console.log(t.function.name));
     console.log('body end');
 
-    const res = await fetch(MISTRAL_BASE + '/v1/chat/completions', {
+    const res = await fetch(config.base_url + '/v1/chat/completions', {
         method: "POST",
-        headers: headers(),
+        headers: headers(config.api_key),
         body: JSON.stringify(body)
     });
 
