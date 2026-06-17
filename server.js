@@ -17,15 +17,14 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/profiles", express.static(path.join(__dirname, "public/profiles")));
+app.use("/settings", express.static(path.join(__dirname, "public/settings")));
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public/index/index.html"));
 });
 
-app.use("/config", express.static(path.join(__dirname, "public/config")));
-app.get("/config", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/config/index.html"));
+app.get("/settings", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/settings/index.html"));
 });
 
 // --- Config ---
