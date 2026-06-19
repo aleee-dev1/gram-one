@@ -41,16 +41,16 @@ app.post("/api/config", async (req, res) => {
     try {
         const { baseUrl, apiKey } = req.body;
         if (!baseUrl || !apiKey) return res.status(400).json({ success: false, error: "Missing baseUrl or apiKey" });
-        
+
         // Test fetching models to verify
         const r = await fetch(baseUrl + "/v1/models", {
             headers: { Authorization: `Bearer ${apiKey}` }
         });
-        
+
         if (!r.ok) {
             throw new Error(`Failed to fetch models: ${r.status} ${await r.text()}`);
         }
-        
+
         await updateConfig(baseUrl, apiKey);
         res.json({ success: true });
     } catch (err) {
