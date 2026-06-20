@@ -6,13 +6,15 @@
     "scripts": {
         "dev": "node --watch server.js",
         "start": "node server.js",
-        "build:css": "tailwindcss -i ./src/input.css -o ./public/output.css --watch"
+        "build:css": "tailwindcss -i ./src/input.css -o ./public/output.css --watch",
+        "chroma": "chroma run --path ./databases/chroma-db"
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.29.0",
         "@mozilla/readability": "^0.6.0",
         "axios": "^1.16.1",
         "cheerio": "^1.2.0",
+        "chromadb": "^3.4.3",
         "express": "^4.19.2",
         "jsdom": "^29.0.2",
         "open": "^11.0.0",

@@ -48,24 +48,6 @@ All conversations are stored and can be revisited later.
 
 ---
 
-### Lightweight Fact Memory
-
-Gram One includes a lightweight fact system powered by retrieval.
-
-Facts can be stored and recalled across chats when relevant.
-
-Examples:
-
-* Where your car keys are
-* Important reminders
-* Preferences
-* Personal notes
-* Project-specific information
-
-This is intentionally **not** a full long-term memory system. Instead, it focuses on storing useful facts and retrieving them when needed through RAG.
-
----
-
 ### MCP Server Support
 
 Gram One works with MCP servers and can leverage tools exposed through them.

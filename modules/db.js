@@ -2,6 +2,10 @@ import sqlite3 from "sqlite3";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import { ChromaClient } from "chromadb";
+
+const chromaClient = new ChromaClient({ path: "http://localhost:8000" });
+let messagesCollection;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, "../databases/main.db");
@@ -9,7 +13,16 @@ fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
 let db;
 
-export function initDb() {
+export async function initDb() {
+    try {
+        messagesCollection = await chromaClient.getOrCreateCollection({
+            name: "messages",
+            metadata: { "hnsw:space": "cosine" }
+        });
+    } catch (e) {
+        console.error("ChromaDB init error:", e);
+    }
+
     return new Promise((resolve, reject) => {
         db = new sqlite3.Database(DB_PATH, err => {
             if (err) return reject(err);
@@ -185,26 +198,67 @@ export async function saveMessage(convId, role, content, promptTokens, completio
             promptTokens || 0, completionTokens || 0, embedding]
     );
     await run("UPDATE conversations SET updated_at = unixepoch() WHERE id = ?", [convId]);
+
+    if (extra.embedding && messagesCollection) {
+        try {
+            await messagesCollection.add({
+                ids: [result.lastID.toString()],
+                embeddings: [extra.embedding],
+                metadatas: [{ conversation_id: Number(convId), role: role, created_at: Date.now() }],
+                documents: [content || ""]
+            });
+        } catch (e) {
+            console.error("Chroma DB add error:", e);
+        }
+    }
+
     return result.lastID;
 }
 
 // ── RAG: messages ─────────────────────────────────────────────────────────────
 
 export async function getRelevantMessages(convId, queryEmbedding, topK = 5, recentK = 3) {
-    const rows = await all(
-        `SELECT id, role, content, embedding FROM messages
-         WHERE conversation_id = ? AND embedding IS NOT NULL AND role IN ('user', 'assistant')
-         ORDER BY created_at ASC, id ASC`,
-        [convId]
+    const recentRows = await all(
+        `SELECT id FROM messages 
+         WHERE conversation_id = ? AND role IN ('user', 'assistant') 
+         ORDER BY created_at DESC, id DESC LIMIT ?`,
+        [convId, recentK]
     );
-    const parsed = rows.map(r => ({ ...r, embedding: JSON.parse(r.embedding) }));
-    const recent = parsed.slice(-recentK);
-    const recentIds = new Set(recent.map(r => r.id));
-    const topSimilar = parsed
-        .filter(r => !recentIds.has(r.id))
-        .map(r => ({ ...r, score: cosine(queryEmbedding, r.embedding) }))
-        .sort((a, b) => b.score - a.score)
-        .slice(0, topK);
+    const recentIds = new Set(recentRows.map(r => r.id.toString()));
+
+    let topSimilar = [];
+    if (messagesCollection) {
+        try {
+            const results = await messagesCollection.query({
+                queryEmbeddings: [queryEmbedding],
+                nResults: topK + recentK,
+                where: {
+                    "$and": [
+                        { "conversation_id": { "$eq": Number(convId) } },
+                        { "role": { "$in": ["user", "assistant"] } }
+                    ]
+                }
+            });
+            if (results.ids && results.ids[0]) {
+                const ids = results.ids[0];
+                const metadatas = results.metadatas[0];
+                const documents = results.documents[0];
+                
+                for (let i = 0; i < ids.length; i++) {
+                    if (!recentIds.has(ids[i])) {
+                        topSimilar.push({
+                            id: parseInt(ids[i]),
+                            role: metadatas[i].role,
+                            content: documents[i]
+                        });
+                        if (topSimilar.length >= topK) break;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Chroma query error:", e);
+        }
+    }
     return topSimilar;
 }
 
