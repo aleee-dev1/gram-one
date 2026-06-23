@@ -14,37 +14,48 @@ export const clients = {};
 
 export async function initMcp() {
     try {
-        const files = await fs.readdir(mcpDir);
-        for (const file of files) {
-            console.log('Loading', file);
-            if (file.endsWith(".js")) {
-                const transport = new StdioClientTransport({
-                    command: "node",
-                    args: [path.join(mcpDir, file)],
-                    env: { ...process.env}
-                });
-                const client = new Client(
-                    { name: "gram-one", version: "1.0.0" },
-                    { capabilities: {} }
-                );
-                await client.connect(transport);
-                const serverName = file.replace(".js", "");
-                clients[serverName] = client;
-                console.log(`Loaded MCP server: ${file}`);
-                
-                const content = await fs.readFile(path.join(mcpDir, file), "utf-8");
-                const hash = crypto.createHash("sha256").update(content).digest("hex");
-                const meta = await getMcpServerMeta(serverName);
-                if (!meta || meta.shasum !== hash) {
-                    console.log(`Updating tools for ${serverName}`);
-                    await clearMcpTools(serverName);
-                    const res = await client.listTools();
-                    for (const tool of res.tools) {
-                        const details = `${tool.name}: ${tool.description}`;
-                        const embedding = await embedText(details);
-                        await saveMcpTool(serverName, tool.name, tool.description, tool.inputSchema || { type: "object", properties: {} }, embedding);
+        const categories = ['extended', 'legacy'];
+        for (const category of categories) {
+            const categoryDir = path.join(mcpDir, category);
+            let files = [];
+            try {
+                files = await fs.readdir(categoryDir);
+            } catch (err) {
+                if (err.code !== 'ENOENT') throw err;
+                continue;
+            }
+            for (const file of files) {
+                console.log(`Loading ${category}/${file}`);
+                if (file.endsWith(".js")) {
+                    const serverPath = path.join(categoryDir, file);
+                    const transport = new StdioClientTransport({
+                        command: "node",
+                        args: [serverPath],
+                        env: { ...process.env}
+                    });
+                    const client = new Client(
+                        { name: "gram-one", version: "1.0.0" },
+                        { capabilities: {} }
+                    );
+                    await client.connect(transport);
+                    const serverName = file.replace(".js", "");
+                    clients[serverName] = client;
+                    console.log(`Loaded MCP server: ${category}/${file}`);
+                    
+                    const content = await fs.readFile(serverPath, "utf-8");
+                    const hash = crypto.createHash("sha256").update(content).digest("hex");
+                    const meta = await getMcpServerMeta(serverName);
+                    if (!meta || meta.shasum !== hash) {
+                        console.log(`Updating tools for ${serverName}`);
+                        await clearMcpTools(serverName);
+                        const res = await client.listTools();
+                        for (const tool of res.tools) {
+                            const details = `${tool.name}: ${tool.description}`;
+                            const embedding = await embedText(details);
+                            await saveMcpTool(serverName, tool.name, tool.description, tool.inputSchema || { type: "object", properties: {} }, embedding);
+                        }
+                        await updateMcpServerMeta(serverName, hash);
                     }
-                    await updateMcpServerMeta(serverName, hash);
                 }
             }
         }
