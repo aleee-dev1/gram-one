@@ -4,7 +4,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { ChromaClient } from "chromadb";
 
-const chromaClient = new ChromaClient({ path: "http://localhost:8000" });
+const chromaClient = new ChromaClient({ host: "localhost", port: 8000 });
 let messagesCollection;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -17,7 +17,8 @@ export async function initDb() {
     try {
         messagesCollection = await chromaClient.getOrCreateCollection({
             name: "messages",
-            metadata: { "hnsw:space": "cosine" }
+            metadata: { "hnsw:space": "cosine" },
+            embeddingFunction: { generate: async (texts) => { throw new Error("unused"); } }
         });
     } catch (e) {
         console.error("ChromaDB init error:", e);
@@ -100,7 +101,7 @@ export async function initDb() {
                 db.run("INSERT OR IGNORE INTO config (id, base_url, api_key) VALUES (1, ?, ?)", [
                     'https://api.mistral.ai', process.env.MISTRAL_API_KEY || ''
                 ]);
-                
+
                 db.run("INSERT OR IGNORE INTO profiles (id, name, system_prompt) VALUES (1, 'Mr Daniel', 'You are a helpful assistant')", resolve);
             });
         });
@@ -181,10 +182,10 @@ export async function getMessages(convId) {
          FROM messages WHERE conversation_id = ? ORDER BY created_at ASC, id ASC`,
         [convId]
     );
-    return rows.map(r => { 
-        if (r.tool_calls) r.tool_calls = JSON.parse(r.tool_calls); 
+    return rows.map(r => {
+        if (r.tool_calls) r.tool_calls = JSON.parse(r.tool_calls);
         if (r.embedding) r.embedding = JSON.parse(r.embedding);
-        return r; 
+        return r;
     });
 }
 
@@ -243,7 +244,7 @@ export async function getRelevantMessages(convId, queryEmbedding, topK = 5, rece
                 const ids = results.ids[0];
                 const metadatas = results.metadatas[0];
                 const documents = results.documents[0];
-                
+
                 for (let i = 0; i < ids.length; i++) {
                     if (!recentIds.has(ids[i])) {
                         topSimilar.push({
