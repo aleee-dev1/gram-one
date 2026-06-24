@@ -150,7 +150,7 @@ async function selectConversation(id, title, profileId, mcpServers) {
     $("messages").innerHTML = "";
     const msgs = await api(`/api/conversations/${id}/messages`);
     msgs.forEach(m => {
-        const { toolsContainer } = appendMessage(m.role, m.content, { prompt_tokens: m.prompt_tokens, completion_tokens: m.completion_tokens });
+        const { toolsContainer } = appendMessage(m.role, m.content, { prompt_tokens: m.prompt_tokens, completion_tokens: m.completion_tokens, tool_name: m.tool_name });
         (m.tool_calls || []).forEach(tc => appendToolCallUI(toolsContainer, tc, true));
     });
     scrollToBottom();
@@ -181,7 +181,7 @@ function updateMcpTogglesState() {
 }
 
 /** --- MESSAGING --- **/
-function appendMessage(role, content = "", tokenInfo = null) {
+function appendMessage(role, content = "", options = null) {
     const wrap = document.createElement("div");
     wrap.className = "message";
 
@@ -206,17 +206,17 @@ function appendMessage(role, content = "", tokenInfo = null) {
 
     const bubble = wrap.querySelector(".bubble");
     if (role === "assistant") bubble.innerHTML = DOMPurify.sanitize(marked.parse(content), domPurifyConfig);
-    else if (role === "tool") renderToolResult(bubble, content);
+    else if (role === "tool") renderToolResult(bubble, content, options?.tool_name);
     else bubble.textContent = content;
 
     const contentWrap = wrap.querySelector(".msg-content-wrapper");
-    if (tokenInfo?.prompt_tokens) appendTokenInfo(contentWrap, tokenInfo.prompt_tokens, tokenInfo.completion_tokens);
+    if (options?.prompt_tokens) appendTokenInfo(contentWrap, options.prompt_tokens, options.completion_tokens);
 
     $("messages").appendChild(wrap);
     return { bubble, toolsContainer: wrap.querySelector(".tools-container"), contentWrap };
 }
 
-function renderToolResult(el, content) {
+function renderToolResult(el, content, toolNameRaw = "") {
     let isSuccess = true, display = content;
     try {
         const p = JSON.parse(content);
@@ -227,12 +227,21 @@ function renderToolResult(el, content) {
     } catch { }
 
     const color = isSuccess ? '#3fb950' : '#e53e3e';
+
+    let serverName = "Unknown", toolName = "Unknown";
+    if (toolNameRaw && toolNameRaw.includes("__")) {
+        [serverName, toolName] = toolNameRaw.split("__");
+    } else if (toolNameRaw) {
+        toolName = toolNameRaw;
+    }
+    let headerText = toolNameRaw ? `${escapeHtml(serverName)} / ${escapeHtml(toolName)}` : "Tool Result";
+
     el.innerHTML = `
         <div class="tool-result-box border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[8px] bg-[#f0f0f0] dark:bg-[#1e1e1e] overflow-hidden mt-[4px] w-full">
             <div class="tool-result-header flex items-center justify-between p-[12px] cursor-pointer hover:bg-[#eef0f2] dark:hover:bg-[#2f2f2f] transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')">
                 <div class="flex items-center gap-[10px]">
                     <div class="w-[10px] h-[10px] rounded-full bg-[${color}] shadow-[0_0_4px_${color}]"></div>
-                    <span class="text-[13px] font-semibold text-[#1a1a1a] dark:text-[#c9d1d9]">Tool Result</span>
+                    <span class="text-[13px] font-semibold text-[#1a1a1a] dark:text-[#c9d1d9]">${headerText}</span>
                 </div>
                 <i class="fa-solid fa-chevron-down text-[12px] transition-transform"></i>
             </div>
@@ -271,7 +280,7 @@ async function handleToolDecision(wrap, tc, allowed) {
         const body = { tool_call_id: tc.id, name: tc.function.name, arguments: allowed ? tc.function.arguments : '{"error": "User denied tool execution"}' };
         const trData = await api(`/api/conversations/${activeConvId}/execute_tool`, 'POST', body);
         btnArea.innerHTML = `<span class="text-[13px] font-medium ${allowed ? 'text-[#2e7d32]' : 'text-[#e53e3e]'}">${allowed ? 'Done' : 'Denied'}</span>`;
-        appendMessage("tool", typeof trData === 'string' ? trData : JSON.stringify(trData));
+        appendMessage("tool", typeof trData === 'string' ? trData : JSON.stringify(trData), { tool_name: tc.function.name });
         scrollToBottom();
         sendMessage({ isContinue: true });
     } catch (err) {
