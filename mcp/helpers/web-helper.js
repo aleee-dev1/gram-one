@@ -14,12 +14,9 @@ export async function searchKeywords(keywords, maxResults = 10) {
         throw new Error("maxResults must be between 1 and 10");
     }
 
-    let results;
+    let results = await searXNG(keywords);
 
-    try {
-        results = await searXNG(keywords);
-    } catch(err) {
-        console.error("SearXNG failed:", err.message);
+    if(results.length === 0) {
         results = await rawSearch(keywords);
     }
 

@@ -10,6 +10,7 @@
         "chroma": "chroma run --path ./databases/chroma-db"
     },
     "dependencies": {
+        "@mistralai/mistralai": "^2.3.0",
         "@modelcontextprotocol/sdk": "^1.29.0",
         "@mozilla/readability": "^0.6.0",
         "axios": "^1.16.1",
