@@ -8,7 +8,7 @@ import { getMcpServerMeta, updateMcpServerMeta, clearMcpTools, saveMcpTool } fro
 import { embedText } from "./ai.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const mcpDir = path.join(__dirname, "../mcp/servers");
+const mcpDir = path.join(__dirname, "../mcp");
 
 export const clients = {};
 

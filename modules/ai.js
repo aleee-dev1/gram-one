@@ -18,7 +18,6 @@ export async function embedText(text) {
     return (await res.json()).data[0].embedding;
 }
 
-
 export async function* streamChat(messages, model, systemPrompt, tools = null) {
     const config = await getConfig();
     if (!config) throw new Error("AI provider config not set");
