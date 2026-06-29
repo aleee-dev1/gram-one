@@ -209,10 +209,6 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
 
             const relevantMessages = await getRelevantMessages(convId, queryEmbedding);
 
-            console.log('----------------- raw relevant messages');
-
-            console.log(relevantMessages)
-
             const msgBlock = relevantMessages.length ? "Relevant conversation context:\n" + relevantMessages.map(r => `[${r.role}]: ${r.content}`).join("\n") : "";
 
             ragContext = [msgBlock].filter(Boolean).join("\n\n");
@@ -386,10 +382,8 @@ app.post("/api/conversations/:id/execute_tool", async (req, res) => {
 initDb()
     .then(() => initMcp())
     .then(() => {
-        // console.clear();
         console.log('   GRAM ONE');
         console.log(`🚀 Listening on http://localhost:${PORT}\n`);
-        // open(`http://localhost:${PORT}`)
         app.listen(PORT);
     })
     .catch(err => {
