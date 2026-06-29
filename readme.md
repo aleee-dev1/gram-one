@@ -110,10 +110,8 @@ Potential future expansions include:
 * Full Long-term Memory System
 * Agent Loops
 * Advanced Context Management
-* Chroma DB for vector storage
 * Presistent Terminal MCP
 * File & Photo upload support
-* Provider Manager UI
 * Improved Retrieval System
 * Polished profile UI
 * Conversation Params UI
