@@ -27,6 +27,9 @@ const saveMsg = document.getElementById("save-msg");
 const configForm = document.getElementById("configForm");
 const baseUrlInput = document.getElementById("baseUrl");
 const apiKeyInput = document.getElementById("apiKey");
+const tavilyApiKeyInput = document.getElementById("tavilyApiKey");
+const searxngBaseUrlInput = document.getElementById("searxngBaseUrl");
+const searxngPortInput = document.getElementById("searxngPort");
 const testBtn = document.getElementById("testBtn");
 const statusMessage = document.getElementById("statusMessage");
 
@@ -168,6 +171,9 @@ async function loadConfig() {
             const config = await res.json();
             if (config.base_url) baseUrlInput.value = config.base_url;
             if (config.api_key) apiKeyInput.value = config.api_key;
+            if (config.tavily_api_key) tavilyApiKeyInput.value = config.tavily_api_key;
+            if (config.searxng_base_url) searxngBaseUrlInput.value = config.searxng_base_url;
+            if (config.searxng_port) searxngPortInput.value = config.searxng_port;
         }
     } catch (err) {
         console.error("Could not load config", err);
@@ -185,6 +191,9 @@ configForm.addEventListener("submit", async (e) => {
     
     const baseUrl = baseUrlInput.value.trim();
     const apiKey = apiKeyInput.value.trim();
+    const tavilyApiKey = tavilyApiKeyInput.value.trim();
+    const searxngBaseUrl = searxngBaseUrlInput.value.trim();
+    const searxngPort = searxngPortInput.value.trim();
     
     if (!baseUrl || !apiKey) return;
 
@@ -197,7 +206,7 @@ configForm.addEventListener("submit", async (e) => {
         const res = await fetch("/api/config", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ baseUrl, apiKey })
+            body: JSON.stringify({ baseUrl, apiKey, tavilyApiKey, searxngBaseUrl, searxngPort })
         });
         
         const data = await res.json();

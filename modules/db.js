@@ -94,9 +94,16 @@ export async function initDb() {
                     CREATE TABLE IF NOT EXISTS config (
                         id INTEGER PRIMARY KEY CHECK (id = 1),
                         base_url TEXT NOT NULL,
-                        api_key TEXT NOT NULL
+                        api_key TEXT NOT NULL,
+                        tavily_api_key TEXT,
+                        searxng_base_url TEXT,
+                        searxng_port TEXT
                     )
                 `);
+                
+                db.run("ALTER TABLE config ADD COLUMN tavily_api_key TEXT", () => {});
+                db.run("ALTER TABLE config ADD COLUMN searxng_base_url TEXT", () => {});
+                db.run("ALTER TABLE config ADD COLUMN searxng_port TEXT", () => {});
 
                 db.run("INSERT OR IGNORE INTO config (id, base_url, api_key) VALUES (1, ?, ?)", [
                     'https://api.mistral.ai', process.env.MISTRAL_API_KEY || ''
@@ -137,11 +144,11 @@ function cosine(a, b) {
 // ── config ────────────────────────────────────────────────────────────────────
 
 export function getConfig() {
-    return get("SELECT base_url, api_key FROM config WHERE id = 1");
+    return get("SELECT base_url, api_key, tavily_api_key, searxng_base_url, searxng_port FROM config WHERE id = 1");
 }
 
-export function updateConfig(baseUrl, apiKey) {
-    return run("UPDATE config SET base_url = ?, api_key = ? WHERE id = 1", [baseUrl, apiKey]);
+export function updateConfig(baseUrl, apiKey, tavilyApiKey, searxngBaseUrl, searxngPort) {
+    return run("UPDATE config SET base_url = ?, api_key = ?, tavily_api_key = ?, searxng_base_url = ?, searxng_port = ? WHERE id = 1", [baseUrl, apiKey, tavilyApiKey, searxngBaseUrl, searxngPort]);
 }
 
 // ── conversations ─────────────────────────────────────────────────────────────

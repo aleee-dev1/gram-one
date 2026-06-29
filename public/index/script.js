@@ -218,11 +218,58 @@ function appendMessage(role, content = "", options = null) {
 
 function renderToolResult(el, content, toolNameRaw = "") {
     let isSuccess = true, display = content;
+    let isWebSearch = false;
+    let searchResultsHtml = "";
+
     try {
         const p = JSON.parse(content);
         if (p && typeof p === 'object') {
             isSuccess = p.success !== false;
             display = typeof p.content === 'string' ? p.content : JSON.stringify(p.content, null, 2);
+            
+            let resultsData = null;
+            let rawParsed = typeof p.content === 'string' ? null : p.content;
+            
+            if (typeof p.content === 'string') {
+                try { rawParsed = JSON.parse(p.content); } catch(e) {}
+            }
+            
+            if (rawParsed && typeof rawParsed === 'object') {
+                if (Array.isArray(rawParsed)) {
+                    resultsData = rawParsed;
+                } else if (rawParsed.results && Array.isArray(rawParsed.results)) {
+                    resultsData = rawParsed.results;
+                } else if (rawParsed.data && Array.isArray(rawParsed.data)) {
+                    resultsData = rawParsed.data;
+                }
+            }
+            
+            if (resultsData && Array.isArray(resultsData) && resultsData.length > 0 && (resultsData[0].url || resultsData[0].link)) {
+                if (toolNameRaw && toolNameRaw.toLowerCase().includes('search')) {
+                    isWebSearch = true;
+                    searchResultsHtml = '<div class="flex flex-col gap-[12px]">' + resultsData.map(res => {
+                        const url = res.url || res.link || "";
+                        const title = res.title || res.name || url;
+                        const desc = res.description || res.snippet || res.content || '';
+                        
+                        let domain = "";
+                        try {
+                            domain = new URL(url).hostname;
+                        } catch(e) {}
+
+                        return `
+                            <div class="border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[8px] p-[12px] bg-[#ffffff] dark:bg-[#242424] hover:border-[#d2d6da] dark:hover:border-[#555] transition-colors">
+                                <div class="flex items-center gap-[8px] mb-[4px] overflow-hidden">
+                                    ${domain ? `<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" class="w-[16px] h-[16px] rounded-[2px] bg-white shrink-0" />` : '<i class="fa-solid fa-globe text-[#8b949e] text-[14px] shrink-0"></i>'}
+                                    <a href="${url}" target="_blank" class="text-[14px] font-semibold text-[#1a1a1a] dark:text-[#e0e0e0] hover:underline truncate">${escapeHtml(title)}</a>
+                                </div>
+                                <div class="text-[11px] text-[#adb5bd] dark:text-[#8b949e] mb-[8px] truncate"><a href="${url}" target="_blank" class="hover:underline text-[#adb5bd] dark:text-[#8b949e]">${escapeHtml(url)}</a></div>
+                                <p class="text-[13px] text-[#6c757d] dark:text-[#a0a0a0] leading-[1.5] m-0">${escapeHtml(desc)}</p>
+                            </div>
+                        `;
+                    }).join('') + '</div>';
+                }
+            }
         }
     } catch { }
 
@@ -235,18 +282,21 @@ function renderToolResult(el, content, toolNameRaw = "") {
         toolName = toolNameRaw;
     }
     let headerText = toolNameRaw ? `${escapeHtml(serverName)} / ${escapeHtml(toolName)}` : "Tool Result";
+    
+    const contentClass = isWebSearch ? "" : "hidden";
+    const chevronClass = isWebSearch ? "rotate-180" : "";
 
     el.innerHTML = `
         <div class="tool-result-box border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[8px] bg-[#f0f0f0] dark:bg-[#1e1e1e] overflow-hidden mt-[4px] w-full">
-            <div class="tool-result-header flex items-center justify-between p-[12px] cursor-pointer hover:bg-[#eef0f2] dark:hover:bg-[#2f2f2f] transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')">
+            <div class="tool-result-header flex items-center justify-between p-[12px] cursor-pointer hover:bg-[#eef0f2] dark:hover:bg-[#2f2f2f] transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.fa-chevron-down').classList.toggle('rotate-180')">
                 <div class="flex items-center gap-[10px]">
                     <div class="w-[10px] h-[10px] rounded-full bg-[${color}] shadow-[0_0_4px_${color}]"></div>
                     <span class="text-[13px] font-semibold text-[#1a1a1a] dark:text-[#c9d1d9]">${headerText}</span>
                 </div>
-                <i class="fa-solid fa-chevron-down text-[12px] transition-transform"></i>
+                <i class="fa-solid fa-chevron-down text-[12px] transition-transform ${chevronClass}"></i>
             </div>
-            <div class="tool-result-content hidden p-[12px] border-t border-[#eef0f2] dark:border-[#3d3d3d] overflow-x-auto">
-                <pre class="text-[12.5px] whitespace-pre-wrap m-0 font-mono">${escapeHtml(display)}</pre>
+            <div class="tool-result-content ${contentClass} p-[12px] border-t border-[#eef0f2] dark:border-[#3d3d3d] overflow-x-auto">
+                ${isWebSearch ? searchResultsHtml : `<pre class="text-[12.5px] whitespace-pre-wrap m-0 font-mono">${escapeHtml(display)}</pre>`}
             </div>
         </div>`;
 }
