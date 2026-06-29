@@ -14,9 +14,12 @@ export async function searchKeywords(keywords, maxResults = 10) {
         throw new Error("maxResults must be between 1 and 10");
     }
 
-    let results = await searXNG(keywords);
+    let results = [];
 
-    if(results.length === 0) {
+    try {
+        results = await searXNG(keywords);
+    } catch (err) {
+        console.log(err);
         results = await rawSearch(keywords);
     }
 
@@ -82,7 +85,7 @@ async function searXNG(keywords) {
 
     const rawResults = data.results;
     const formattedResults = [];
-    
+
     for (let res of rawResults) {
         formattedResults.push({
             title: res.title,
@@ -91,12 +94,12 @@ async function searXNG(keywords) {
             score: +res.score.toFixed(2)
         })
     }
-    
+
     return formattedResults;
 }
 
 export async function scrape(url) {
-    
+
     const res = await fetch(`${TAVILY_BASE}/extract`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -108,10 +111,10 @@ export async function scrape(url) {
     });
 
     if (!res.ok) throw new Error(`Tavily extract failed: ${res.status}`);
-    
+
     const data = await res.json();
     const result = data.results?.[0];
-    
+
     if (!result) throw new Error("No content extracted");
 
     return result.raw_content;

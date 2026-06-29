@@ -334,6 +334,8 @@ app.post("/api/conversations/:id/execute_tool", async (req, res) => {
 
         const rawResult = await executeTool(serverName, toolName, parsedArgs);
 
+        console.log("rawResult: ", rawResult);
+
         // Filter out bulky MCP wrappers to only keep the success boolean and raw content object
         let cleanResult = { success: true, content: rawResult };
 
