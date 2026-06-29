@@ -39,7 +39,7 @@ app.get("/api/config", async (req, res) => {
 
 app.post("/api/config", async (req, res) => {
     try {
-        const { baseUrl, apiKey } = req.body;
+        const { baseUrl, apiKey, tavilyApiKey = "", searxngBaseUrl = "", searxngPort = "" } = req.body;
         if (!baseUrl || !apiKey) return res.status(400).json({ success: false, error: "Missing baseUrl or apiKey" });
 
         // Test fetching models to verify
@@ -51,7 +51,7 @@ app.post("/api/config", async (req, res) => {
             throw new Error(`Failed to fetch models: ${r.status} ${await r.text()}`);
         }
 
-        await updateConfig(baseUrl, apiKey);
+        await updateConfig(baseUrl, apiKey, tavilyApiKey, searxngBaseUrl, searxngPort);
         res.json({ success: true });
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });
