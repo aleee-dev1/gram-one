@@ -6,11 +6,11 @@ const themeToggle = document.getElementById("theme-toggle");
 
 // Tabs
 const tabProfiles = document.getElementById("tab-profiles");
-const tabProvider = document.getElementById("tab-provider");
+const tabConfig = document.getElementById("tab-config");
 
 // Views
 const viewProfiles = document.getElementById("view-profiles");
-const viewProvider = document.getElementById("view-provider");
+const viewConfig = document.getElementById("view-config");
 
 // Profiles View
 const profileList = document.getElementById("profile-list");
@@ -25,8 +25,8 @@ const saveMsg = document.getElementById("save-msg");
 
 // Config View
 const configForm = document.getElementById("configForm");
-const baseUrlInput = document.getElementById("baseUrl");
-const apiKeyInput = document.getElementById("apiKey");
+const llmBaseUrlInput = document.getElementById("llmBaseUrl");
+const llmApiKeyInput = document.getElementById("llmApiKey");
 const tavilyApiKeyInput = document.getElementById("tavilyApiKey");
 const searxngBaseUrlInput = document.getElementById("searxngBaseUrl");
 const searxngPortInput = document.getElementById("searxngPort");
@@ -42,15 +42,15 @@ themeToggle.addEventListener("click", () => {
 // --- Tab Switching ---
 tabProfiles.addEventListener("click", () => {
     tabProfiles.classList.add("active");
-    tabProvider.classList.remove("active");
+    tabConfig.classList.remove("active");
     viewProfiles.classList.remove("hidden");
-    viewProvider.classList.add("hidden");
+    viewConfig.classList.add("hidden");
 });
 
-tabProvider.addEventListener("click", () => {
-    tabProvider.classList.add("active");
+tabConfig.addEventListener("click", () => {
+    tabConfig.classList.add("active");
     tabProfiles.classList.remove("active");
-    viewProvider.classList.remove("hidden");
+    viewConfig.classList.remove("hidden");
     viewProfiles.classList.add("hidden");
     loadConfig();
 });
@@ -169,8 +169,8 @@ async function loadConfig() {
         const res = await fetch("/api/config");
         if (res.ok) {
             const config = await res.json();
-            if (config.base_url) baseUrlInput.value = config.base_url;
-            if (config.api_key) apiKeyInput.value = config.api_key;
+            if (config.base_url) llmBaseUrlInput.value = config.base_url;
+            if (config.api_key) llmApiKeyInput.value = config.api_key;
             if (config.tavily_api_key) tavilyApiKeyInput.value = config.tavily_api_key;
             if (config.searxng_base_url) searxngBaseUrlInput.value = config.searxng_base_url;
             if (config.searxng_port) searxngPortInput.value = config.searxng_port;
@@ -188,13 +188,13 @@ function showStatus(message, isError) {
 
 configForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
-    const baseUrl = baseUrlInput.value.trim();
-    const apiKey = apiKeyInput.value.trim();
+
+    const baseUrl = llmBaseUrlInput.value.trim();
+    const apiKey = llmApiKeyInput.value.trim();
     const tavilyApiKey = tavilyApiKeyInput.value.trim();
     const searxngBaseUrl = searxngBaseUrlInput.value.trim();
     const searxngPort = searxngPortInput.value.trim();
-    
+
     if (!baseUrl || !apiKey) return;
 
     testBtn.disabled = true;
@@ -208,9 +208,9 @@ configForm.addEventListener("submit", async (e) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ baseUrl, apiKey, tavilyApiKey, searxngBaseUrl, searxngPort })
         });
-        
+
         const data = await res.json();
-        
+
         if (res.ok && data.success) {
             showStatus("Configuration works and was saved successfully!", false);
         } else {
@@ -220,9 +220,27 @@ configForm.addEventListener("submit", async (e) => {
         showStatus(`Network error: ${err.message}`, true);
     } finally {
         testBtn.disabled = false;
-        testBtn.textContent = "Test & Save";
+        testBtn.textContent = "Save Configuration";
         testBtn.classList.remove("opacity-70");
     }
+});
+
+// --- Per-field dummy test buttons ---
+document.querySelectorAll(".test-field-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const original = btn.textContent;
+        btn.textContent = "Testing...";
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.textContent = "OK";
+            btn.classList.add("border-green-400", "text-green-600");
+            setTimeout(() => {
+                btn.textContent = original;
+                btn.disabled = false;
+                btn.classList.remove("border-green-400", "text-green-600");
+            }, 1500);
+        }, 800);
+    });
 });
 
 // Initialize

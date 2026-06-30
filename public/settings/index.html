@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,211 +9,398 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #d2d6da; border-radius: 3px; }
-        .dark ::-webkit-scrollbar-thumb { background: #444; }
-        ::-webkit-scrollbar-thumb:hover { background: #adb5bd; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d2d6da;
+            border-radius: 3px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #444;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #adb5bd;
+        }
 
         /* Main Sidebar Tabs */
-        .settings-tab { transition: all 0.15s ease-in-out; }
-        .settings-tab.active { background-color: #ebf4ff; color: #2b6cb0; font-weight: 600; }
-        .dark .settings-tab.active { background-color: #1a2b4c; color: #4f8ef7; }
-        
-        .settings-tab.active i { color: #2b6cb0; }
-        .dark .settings-tab.active i { color: #4f8ef7; }
+        .settings-tab {
+            transition: all 0.15s ease-in-out;
+        }
+
+        .settings-tab.active {
+            background-color: #ebf4ff;
+            color: #2b6cb0;
+            font-weight: 600;
+        }
+
+        .dark .settings-tab.active {
+            background-color: #1a2b4c;
+            color: #4f8ef7;
+        }
+
+        .settings-tab.active i {
+            color: #2b6cb0;
+        }
+
+        .dark .settings-tab.active i {
+            color: #4f8ef7;
+        }
 
         /* Profiles sub-sidebar list item */
-        .profile-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; cursor: pointer; border-radius: 8px; transition: all 0.15s ease; gap: 10px; }
-        .profile-item:hover { background-color: #eef0f2; }
-        .dark .profile-item:hover { background-color: #2a2a2a; }
-        .profile-item.active { background-color: #ebf4ff; }
-        .dark .profile-item.active { background-color: #1a2b4c; }
-        
-        .profile-icon { color: #adb5bd; font-size: 14px; width: 16px; text-align: center; transition: color 0.15s; }
-        .dark .profile-icon { color: #777; }
-        .profile-item:hover .profile-icon { color: #6c757d; }
-        .dark .profile-item:hover .profile-icon { color: #a0a0a0; }
-        .profile-item.active .profile-icon { color: #2b6cb0 !important; }
-        .dark .profile-item.active .profile-icon { color: #4f8ef7 !important; }
-        
-        .profile-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; font-weight: 500; color: #6c757d; }
-        .dark .profile-name { color: #a0a0a0; }
-        .profile-item.active .profile-name { color: #2b6cb0; font-weight: 600; }
-        .dark .profile-item.active .profile-name { color: #4f8ef7; }
-        
-        .del-btn { background: none; border: none; color: #adb5bd; cursor: pointer; font-size: 12px; padding: 4px; border-radius: 4px; opacity: 0; transition: all 0.15s; flex-shrink: 0; }
-        .dark .del-btn { color: #777; }
-        .profile-item:hover .del-btn { opacity: 1; }
-        .del-btn:hover { color: #e53e3e !important; background-color: #fee2e2 !important; }
-        .dark .del-btn:hover { background-color: rgba(229,62,62,0.2) !important; }
+        .profile-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            gap: 10px;
+        }
+
+        .profile-item:hover {
+            background-color: #eef0f2;
+        }
+
+        .dark .profile-item:hover {
+            background-color: #2a2a2a;
+        }
+
+        .profile-item.active {
+            background-color: #ebf4ff;
+        }
+
+        .dark .profile-item.active {
+            background-color: #1a2b4c;
+        }
+
+        .profile-icon {
+            color: #adb5bd;
+            font-size: 14px;
+            width: 16px;
+            text-align: center;
+            transition: color 0.15s;
+        }
+
+        .dark .profile-icon {
+            color: #777;
+        }
+
+        .profile-item:hover .profile-icon {
+            color: #6c757d;
+        }
+
+        .dark .profile-item:hover .profile-icon {
+            color: #a0a0a0;
+        }
+
+        .profile-item.active .profile-icon {
+            color: #2b6cb0 !important;
+        }
+
+        .dark .profile-item.active .profile-icon {
+            color: #4f8ef7 !important;
+        }
+
+        .profile-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 13px;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .dark .profile-name {
+            color: #a0a0a0;
+        }
+
+        .profile-item.active .profile-name {
+            color: #2b6cb0;
+            font-weight: 600;
+        }
+
+        .dark .profile-item.active .profile-name {
+            color: #4f8ef7;
+        }
+
+        .del-btn {
+            background: none;
+            border: none;
+            color: #adb5bd;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .dark .del-btn {
+            color: #777;
+        }
+
+        .profile-item:hover .del-btn {
+            opacity: 1;
+        }
+
+        .del-btn:hover {
+            color: #e53e3e !important;
+            background-color: #fee2e2 !important;
+        }
+
+        .dark .del-btn:hover {
+            background-color: rgba(229, 62, 62, 0.2) !important;
+        }
     </style>
 </head>
-<body class="h-full bg-[#ffffff] dark:bg-[#121212] text-[#1a1a1a] dark:text-[#e0e0e0] font-['Inter',system-ui,sans-serif] text-[14px]">
-<script>
-    if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark");
-</script>
 
-<div class="flex h-screen overflow-hidden">
+<body
+    class="h-full bg-[#ffffff] dark:bg-[#121212] text-[#1a1a1a] dark:text-[#e0e0e0] font-['Inter',system-ui,sans-serif] text-[14px]">
+    <script>
+        if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark");
+    </script>
 
-    <!-- Primary Settings Sidebar -->
-    <aside id="main-sidebar" class="w-[240px] min-w-[240px] bg-[#f8f9fa] dark:bg-[#1a1a1a] border-r border-[#eef0f2] dark:border-[#2a2a2a] flex flex-col overflow-hidden z-10">
-        <!-- Header -->
-        <div class="flex items-center pt-[24px] pb-[16px] px-[20px] min-h-[70px]">
-            <div class="flex items-center gap-[10px] overflow-hidden whitespace-nowrap">
-                <i class="fa-solid fa-gear text-[#2b6cb0] dark:text-[#4f8ef7] text-[24px] shrink-0"></i>
-                <span class="text-[20px] font-bold text-[#2b6cb0] dark:text-[#4f8ef7] tracking-[-0.5px]">Settings</span>
-            </div>
-        </div>
+    <div class="flex h-screen overflow-hidden">
 
-        <!-- Back -->
-        <div class="pb-[16px] flex px-[20px]">
-            <a href="/" class="inline-flex items-center gap-[8px] text-[13px] text-[#6c757d] dark:text-[#a0a0a0] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] transition-colors duration-150 w-full" title="Back to Chat">
-                <i class="fa-solid fa-arrow-left text-[14px] shrink-0 w-[16px] text-center"></i>
-                <span>Back to Chat</span>
-            </a>
-        </div>
-
-        <!-- Tabs -->
-        <div class="flex flex-col gap-[4px] px-[12px] flex-1">
-            <button id="tab-profiles" class="settings-tab flex items-center gap-[10px] px-[12px] py-[10px] rounded-[8px] text-[13px] text-[#6c757d] dark:text-[#a0a0a0] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] hover:bg-[#eef0f2] dark:hover:bg-[#2a2a2a] w-full text-left active">
-                <i class="fa-solid fa-user-group w-[16px] text-center text-[14px]"></i>
-                <span>Profiles</span>
-            </button>
-            <button id="tab-provider" class="settings-tab flex items-center gap-[10px] px-[12px] py-[10px] rounded-[8px] text-[13px] text-[#6c757d] dark:text-[#a0a0a0] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] hover:bg-[#eef0f2] dark:hover:bg-[#2a2a2a] w-full text-left">
-                <i class="fa-solid fa-microchip w-[16px] text-center text-[14px]"></i>
-                <span>Config</span>
-            </button>
-        </div>
-
-        <!-- Theme toggle -->
-        <div class="pt-[16px] pb-[20px] border-t border-[#eef0f2] dark:border-[#2a2a2a] px-[20px] flex">
-            <button id="theme-toggle"
-                class="flex items-center gap-[8px] rounded-[6px] text-[#6c757d] dark:text-[#a0a0a0] bg-transparent border border-transparent cursor-pointer transition-all duration-150 hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0]"
-                title="Toggle dark mode">
-                <i class="fa-solid fa-moon text-[14px]"></i>
-                <span class="text-[13px]">Toggle Theme</span>
-            </button>
-        </div>
-    </aside>
-
-    <!-- Content Area -->
-    <main class="flex-1 flex overflow-hidden bg-[#ffffff] dark:bg-[#121212]">
-
-        <!-- PROFILES VIEW -->
-        <div id="view-profiles" class="flex-1 flex w-full h-full">
-            <!-- Secondary Sidebar for Profiles -->
-            <aside class="w-[260px] min-w-[260px] border-r border-[#eef0f2] dark:border-[#2a2a2a] flex flex-col overflow-hidden bg-[#fafafa] dark:bg-[#161616]">
-                <div class="pt-[24px] pb-[12px] flex flex-col gap-[12px] px-[20px] items-center">
-                    <div class="flex justify-between items-center w-full">
-                        <span class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Profiles</span>
-                        <button id="new-profile-btn" class="text-[#6c757d] dark:text-[#a0a0a0] hover:text-[#2b6cb0] dark:hover:text-[#4f8ef7] transition-colors" title="New Profile">
-                            <i class="fa-solid fa-plus text-[14px]"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="profile-list" class="flex-1 overflow-y-auto px-[12px] pb-[12px] flex flex-col gap-[2px]"></div>
-            </aside>
-
-            <!-- Profile Editor -->
-            <div class="flex-1 flex flex-col overflow-hidden">
-                <div class="flex items-center px-[32px] py-[20px] border-b border-[#eef0f2] dark:border-[#2a2a2a] min-h-[70px]">
-                    <span id="editor-title" class="text-[16px] font-semibold text-[#1a1a1a] dark:text-[#e0e0e0]">Select or create a profile</span>
-                </div>
-
-                <div id="empty-state" class="flex-1 flex items-center justify-center text-[#adb5bd] dark:text-[#777] text-[14px]">
-                    <div class="text-center flex flex-col items-center gap-[12px]">
-                        <i class="fa-solid fa-user-gear text-[40px]"></i>
-                        <p>Select a profile to edit or create a new one</p>
-                    </div>
-                </div>
-
-                <div id="editor-area" class="hidden flex-1 flex-col p-[32px] gap-[24px] max-w-[720px] w-full overflow-y-auto">
-                    <div class="flex flex-col gap-[8px]">
-                        <label class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Profile Name</label>
-                        <input id="profile-name" type="text" placeholder="e.g. Code Assistant"
-                            class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]" />
-                    </div>
-
-                    <div class="flex flex-col gap-[8px] flex-1">
-                        <label class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">System Prompt</label>
-                        <textarea id="profile-prompt" placeholder="You are a helpful assistant..."
-                            class="flex-1 min-h-[240px] resize-none bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)] leading-[1.6]"></textarea>
-                    </div>
-
-                    <div class="flex items-center gap-[16px]">
-                        <button id="save-btn"
-                            class="bg-[#2b6cb0] dark:bg-[#4f8ef7] text-white border-none rounded-[8px] px-[20px] py-[10px] text-[14px] font-medium cursor-pointer transition-all duration-150 shadow-[0_2px_6px_rgba(43,108,176,0.3)] hover:bg-[#3182ce] dark:hover:bg-[#6aa0ff] hover:scale-[1.02] active:scale-[0.98]">
-                            Save Profile
-                        </button>
-                        <span id="save-msg" class="text-[13px] text-[#2b6cb0] dark:text-[#4f8ef7] opacity-0 transition-opacity duration-300">Saved!</span>
-                    </div>
+        <!-- Primary Settings Sidebar -->
+        <aside id="main-sidebar"
+            class="w-[240px] min-w-[240px] bg-[#f8f9fa] dark:bg-[#1a1a1a] border-r border-[#eef0f2] dark:border-[#2a2a2a] flex flex-col overflow-hidden z-10">
+            <!-- Header -->
+            <div class="flex items-center pt-[24px] pb-[16px] px-[20px] min-h-[70px]">
+                <div class="flex items-center gap-[10px] overflow-hidden whitespace-nowrap">
+                    <i class="fa-solid fa-gear text-[#2b6cb0] dark:text-[#4f8ef7] text-[24px] shrink-0"></i>
+                    <span
+                        class="text-[20px] font-bold text-[#2b6cb0] dark:text-[#4f8ef7] tracking-[-0.5px]">Settings</span>
                 </div>
             </div>
-        </div>
 
-        <!-- AI PROVIDER VIEW -->
-        <div id="view-provider" class="hidden flex-1 flex-col overflow-y-auto">
-            <div class="flex items-center px-[32px] py-[20px] border-b border-[#eef0f2] dark:border-[#2a2a2a] min-h-[70px]">
-                <span class="text-[16px] font-semibold text-[#1a1a1a] dark:text-[#e0e0e0]">Configuration</span>
+            <!-- Back -->
+            <div class="pb-[16px] flex px-[20px]">
+                <a href="/"
+                    class="inline-flex items-center gap-[8px] text-[13px] text-[#6c757d] dark:text-[#a0a0a0] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] transition-colors duration-150 w-full"
+                    title="Back to Chat">
+                    <i class="fa-solid fa-arrow-left text-[14px] shrink-0 w-[16px] text-center"></i>
+                    <span>Back to Chat</span>
+                </a>
             </div>
-            
-            <div class="p-[32px] max-w-[720px] w-full">
-                <div id="statusMessage" class="hidden mb-6 p-4 rounded-[8px] text-[14px]"></div>
 
-                <form id="configForm" class="space-y-[24px]">
-                    <div class="flex flex-col gap-[8px]">
-                        <label for="baseUrl" class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Base URL</label>
-                        <input type="url" id="baseUrl" name="baseUrl" required
-                            class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
-                            placeholder="https://api.mistral.ai">
-                    </div>
-
-                    <div class="flex flex-col gap-[8px]">
-                        <label for="apiKey" class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">API Key</label>
-                        <input type="password" id="apiKey" name="apiKey" required
-                            class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
-                            placeholder="Enter your API key">
-                    </div>
-
-                    <div class="w-full h-px bg-[#eef0f2] dark:bg-[#2a2a2a] my-[8px]"></div>
-
-                    <div class="flex flex-col gap-[8px]">
-                        <label for="tavilyApiKey" class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Tavily API Key (for Web MCP)</label>
-                        <input type="password" id="tavilyApiKey" name="tavilyApiKey"
-                            class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
-                            placeholder="Enter your Tavily API key">
-                    </div>
-
-                    <div class="w-full h-px bg-[#eef0f2] dark:bg-[#2a2a2a] my-[8px]"></div>
-
-                    <div class="flex flex-col gap-[8px]">
-                        <label for="searxngBaseUrl" class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">SearxNG Base URL</label>
-                        <input type="url" id="searxngBaseUrl" name="searxngBaseUrl"
-                            class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
-                            placeholder="http://localhost">
-                    </div>
-
-                    <div class="flex flex-col gap-[8px]">
-                        <label for="searxngPort" class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">SearxNG Port</label>
-                        <input type="number" id="searxngPort" name="searxngPort"
-                            class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
-                            placeholder="8080">
-                    </div>
-
-                    <div class="pt-[8px]">
-                        <button type="submit" id="testBtn"
-                            class="bg-[#2b6cb0] dark:bg-[#4f8ef7] text-white border-none rounded-[8px] px-[24px] py-[10px] text-[14px] font-medium cursor-pointer transition-all duration-150 shadow-[0_2px_6px_rgba(43,108,176,0.3)] hover:bg-[#3182ce] dark:hover:bg-[#6aa0ff] hover:scale-[1.02] active:scale-[0.98]">
-                            Test & Save
-                        </button>
-                    </div>
-                </form>
+            <!-- Tabs -->
+            <div class="flex flex-col gap-[4px] px-[12px] flex-1">
+                <button id="tab-profiles"
+                    class="settings-tab flex items-center gap-[10px] px-[12px] py-[10px] rounded-[8px] text-[13px] text-[#6c757d] dark:text-[#a0a0a0] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] hover:bg-[#eef0f2] dark:hover:bg-[#2a2a2a] w-full text-left active">
+                    <i class="fa-solid fa-user-group w-[16px] text-center text-[14px]"></i>
+                    <span>Profiles</span>
+                </button>
+                <button id="tab-config"
+                    class="settings-tab flex items-center gap-[10px] px-[12px] py-[10px] rounded-[8px] text-[13px] text-[#6c757d] dark:text-[#a0a0a0] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] hover:bg-[#eef0f2] dark:hover:bg-[#2a2a2a] w-full text-left">
+                    <i class="fa-solid fa-microchip w-[16px] text-center text-[14px]"></i>
+                    <span>Config</span>
+                </button>
             </div>
-        </div>
 
-    </main>
-</div>
+            <!-- Theme toggle -->
+            <div class="pt-[16px] pb-[20px] border-t border-[#eef0f2] dark:border-[#2a2a2a] px-[20px] flex">
+                <button id="theme-toggle"
+                    class="flex items-center gap-[8px] rounded-[6px] text-[#6c757d] dark:text-[#a0a0a0] bg-transparent border border-transparent cursor-pointer transition-all duration-150 hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0]"
+                    title="Toggle dark mode">
+                    <i class="fa-solid fa-moon text-[14px]"></i>
+                    <span class="text-[13px]">Toggle Theme</span>
+                </button>
+            </div>
+        </aside>
 
-<script src="/settings/script.js"></script>
+        <!-- Content Area -->
+        <main class="flex-1 flex overflow-hidden bg-[#ffffff] dark:bg-[#121212]">
+
+            <!-- PROFILES VIEW -->
+            <div id="view-profiles" class="flex-1 flex w-full h-full">
+                <!-- Secondary Sidebar for Profiles -->
+                <aside
+                    class="w-[260px] min-w-[260px] border-r border-[#eef0f2] dark:border-[#2a2a2a] flex flex-col overflow-hidden bg-[#fafafa] dark:bg-[#161616]">
+                    <div class="pt-[24px] pb-[12px] flex flex-col gap-[12px] px-[20px] items-center">
+                        <div class="flex justify-between items-center w-full">
+                            <span
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Profiles</span>
+                            <button id="new-profile-btn"
+                                class="text-[#6c757d] dark:text-[#a0a0a0] hover:text-[#2b6cb0] dark:hover:text-[#4f8ef7] transition-colors"
+                                title="New Profile">
+                                <i class="fa-solid fa-plus text-[14px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="profile-list" class="flex-1 overflow-y-auto px-[12px] pb-[12px] flex flex-col gap-[2px]">
+                    </div>
+                </aside>
+
+                <!-- Profile Editor -->
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    <div
+                        class="flex items-center px-[32px] py-[20px] border-b border-[#eef0f2] dark:border-[#2a2a2a] min-h-[70px]">
+                        <span id="editor-title"
+                            class="text-[16px] font-semibold text-[#1a1a1a] dark:text-[#e0e0e0]">Select or create a
+                            profile</span>
+                    </div>
+
+                    <div id="empty-state"
+                        class="flex-1 flex items-center justify-center text-[#adb5bd] dark:text-[#777] text-[14px]">
+                        <div class="text-center flex flex-col items-center gap-[12px]">
+                            <i class="fa-solid fa-user-gear text-[40px]"></i>
+                            <p>Select a profile to edit or create a new one</p>
+                        </div>
+                    </div>
+
+                    <div id="editor-area"
+                        class="hidden flex-1 flex-col p-[32px] gap-[24px] max-w-[720px] w-full overflow-y-auto">
+                        <div class="flex flex-col gap-[8px]">
+                            <label
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Profile
+                                Name</label>
+                            <input id="profile-name" type="text" placeholder="e.g. Code Assistant"
+                                class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]" />
+                        </div>
+
+                        <div class="flex flex-col gap-[8px] flex-1">
+                            <label
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">System
+                                Prompt</label>
+                            <textarea id="profile-prompt" placeholder="You are a helpful assistant..."
+                                class="flex-1 min-h-[240px] resize-none bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)] leading-[1.6]"></textarea>
+                        </div>
+
+                        <div class="flex items-center gap-[16px]">
+                            <button id="save-btn"
+                                class="bg-[#2b6cb0] dark:bg-[#4f8ef7] text-white border-none rounded-[8px] px-[20px] py-[10px] text-[14px] font-medium cursor-pointer transition-all duration-150 shadow-[0_2px_6px_rgba(43,108,176,0.3)] hover:bg-[#3182ce] dark:hover:bg-[#6aa0ff] hover:scale-[1.02] active:scale-[0.98]">
+                                Save Profile
+                            </button>
+                            <span id="save-msg"
+                                class="text-[13px] text-[#2b6cb0] dark:text-[#4f8ef7] opacity-0 transition-opacity duration-300">Saved!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONFIG VIEW -->
+            <div id="view-config" class="hidden flex-1 flex-col overflow-y-auto">
+                <div
+                    class="flex items-center px-[32px] py-[20px] border-b border-[#eef0f2] dark:border-[#2a2a2a] min-h-[70px]">
+                    <span class="text-[16px] font-semibold text-[#1a1a1a] dark:text-[#e0e0e0]">Configuration</span>
+                </div>
+
+                <div class="p-[32px] max-w-[720px] w-full">
+                    <div id="statusMessage" class="hidden mb-6 p-4 rounded-[8px] text-[14px]"></div>
+
+                    <form id="configForm" class="space-y-[28px]">
+
+                        <!-- LLM Provider -->
+                        <div class="flex flex-col gap-[4px]">
+                            <span
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">LLM
+                                Provider</span>
+                            <p class="text-[12px] text-[#adb5bd] dark:text-[#777]">Endpoint and key for your model
+                                provider (OpenAI-compatible API).</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label for="llmBaseUrl"
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Base
+                                URL</label>
+                            <input type="url" id="llmBaseUrl" name="llmBaseUrl" required
+                                class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
+                                placeholder="https://api.mistral.ai">
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label for="llmApiKey"
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">API
+                                Key</label>
+                            <div class="flex items-center gap-[10px]">
+                                <input type="password" id="llmApiKey" name="llmApiKey" required
+                                    class="flex-1 bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
+                                    placeholder="Enter your API key">
+                                <button type="button"
+                                    class="test-field-btn shrink-0 text-[12px] font-medium px-[14px] py-[10px] rounded-[8px] border border-[#d2d6da] dark:border-[#333] text-[#6c757d] dark:text-[#a0a0a0] hover:border-[#2b6cb0] hover:text-[#2b6cb0] dark:hover:border-[#4f8ef7] dark:hover:text-[#4f8ef7] transition-all duration-150"
+                                    data-target="llm">Test</button>
+                            </div>
+                        </div>
+
+                        <div class="w-full h-px bg-[#eef0f2] dark:bg-[#2a2a2a]"></div>
+
+                        <!-- Tavily -->
+                        <div class="flex flex-col gap-[4px]">
+                            <span
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Web
+                                Search (Tavily)</span>
+                            <p class="text-[12px] text-[#adb5bd] dark:text-[#777]">Used by the Web MCP tool for live
+                                search results.</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label for="tavilyApiKey"
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Tavily
+                                API Key</label>
+                            <div class="flex items-center gap-[10px]">
+                                <input type="password" id="tavilyApiKey" name="tavilyApiKey"
+                                    class="flex-1 bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
+                                    placeholder="Enter your Tavily API key">
+                                <button type="button"
+                                    class="test-field-btn shrink-0 text-[12px] font-medium px-[14px] py-[10px] rounded-[8px] border border-[#d2d6da] dark:border-[#333] text-[#6c757d] dark:text-[#a0a0a0] hover:border-[#2b6cb0] hover:text-[#2b6cb0] dark:hover:border-[#4f8ef7] dark:hover:text-[#4f8ef7] transition-all duration-150"
+                                    data-target="tavily">Test</button>
+                            </div>
+                        </div>
+
+                        <div class="w-full h-px bg-[#eef0f2] dark:bg-[#2a2a2a]"></div>
+
+                        <!-- SearxNG -->
+                        <div class="flex flex-col gap-[4px]">
+                            <span
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">SearxNG</span>
+                            <p class="text-[12px] text-[#adb5bd] dark:text-[#777]">Self-hosted metasearch instance, used
+                                as a fallback/alternate search source.</p>
+                        </div>
+                        <div class="flex items-end gap-[10px]">
+                            <div class="flex flex-col gap-[8px] flex-1">
+                                <label for="searxngBaseUrl"
+                                    class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Base
+                                    URL</label>
+                                <input type="url" id="searxngBaseUrl" name="searxngBaseUrl"
+                                    class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
+                                    placeholder="http://localhost">
+                            </div>
+                            <div class="flex flex-col gap-[8px] w-[110px]">
+                                <label for="searxngPort"
+                                    class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Port</label>
+                                <input type="number" id="searxngPort" name="searxngPort"
+                                    class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
+                                    placeholder="8080">
+                            </div>
+                            <button type="button"
+                                class="test-field-btn shrink-0 text-[12px] font-medium px-[14px] py-[10px] rounded-[8px] border border-[#d2d6da] dark:border-[#333] text-[#6c757d] dark:text-[#a0a0a0] hover:border-[#2b6cb0] hover:text-[#2b6cb0] dark:hover:border-[#4f8ef7] dark:hover:text-[#4f8ef7] transition-all duration-150"
+                                data-target="searxng">Test</button>
+                        </div>
+
+                        <div class="pt-[8px]">
+                            <button type="submit" id="testBtn"
+                                class="bg-[#2b6cb0] dark:bg-[#4f8ef7] text-white border-none rounded-[8px] px-[24px] py-[10px] text-[14px] font-medium cursor-pointer transition-all duration-150 shadow-[0_2px_6px_rgba(43,108,176,0.3)] hover:bg-[#3182ce] dark:hover:bg-[#6aa0ff] hover:scale-[1.02] active:scale-[0.98]">
+                                Save Configuration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="/settings/script.js"></script>
 </body>
+
 </html>
