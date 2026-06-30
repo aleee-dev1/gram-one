@@ -96,12 +96,14 @@ export async function initDb() {
                         base_url TEXT NOT NULL,
                         api_key TEXT NOT NULL,
                         tavily_api_key TEXT,
+                        search_engine TEXT,
                         searxng_base_url TEXT,
                         searxng_port TEXT
                     )
                 `);
                 
                 db.run("ALTER TABLE config ADD COLUMN tavily_api_key TEXT", () => {});
+                db.run("ALTER TABLE config ADD COLUMN search_engine TEXT", () => {});
                 db.run("ALTER TABLE config ADD COLUMN searxng_base_url TEXT", () => {});
                 db.run("ALTER TABLE config ADD COLUMN searxng_port TEXT", () => {});
 
@@ -144,11 +146,11 @@ function cosine(a, b) {
 // ── config ────────────────────────────────────────────────────────────────────
 
 export function getConfig() {
-    return get("SELECT base_url, api_key, tavily_api_key, searxng_base_url, searxng_port FROM config WHERE id = 1");
+    return get("SELECT base_url, api_key, tavily_api_key, search_engine, searxng_base_url, searxng_port FROM config WHERE id = 1");
 }
 
-export function updateConfig(baseUrl, apiKey, tavilyApiKey, searxngBaseUrl, searxngPort) {
-    return run("UPDATE config SET base_url = ?, api_key = ?, tavily_api_key = ?, searxng_base_url = ?, searxng_port = ? WHERE id = 1", [baseUrl, apiKey, tavilyApiKey, searxngBaseUrl, searxngPort]);
+export function updateConfig(baseUrl, apiKey, tavilyApiKey, searchEngine, searxngBaseUrl, searxngPort) {
+    return run("UPDATE config SET base_url = ?, api_key = ?, tavily_api_key = ?, search_engine = ?, searxng_base_url = ?, searxng_port = ? WHERE id = 1", [baseUrl, apiKey, tavilyApiKey, searchEngine, searxngBaseUrl, searxngPort]);
 }
 
 // ── conversations ─────────────────────────────────────────────────────────────

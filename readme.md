@@ -140,6 +140,8 @@ cd gram-one
 
 npm install
 
+npm run chroma // in a separate terminal
+
 npm start
 ```
 
