@@ -39,7 +39,7 @@ app.get("/api/config", async (req, res) => {
 
 app.post("/api/config", async (req, res) => {
     try {
-        const { baseUrl, apiKey, tavilyApiKey = "", searxngBaseUrl = "", searxngPort = "" } = req.body;
+        const { baseUrl, apiKey, tavilyApiKey = "", searchEngine = "ddg", searxngBaseUrl = "", searxngPort = "" } = req.body;
         if (!baseUrl || !apiKey) return res.status(400).json({ success: false, error: "Missing baseUrl or apiKey" });
 
         // Test fetching models to verify
@@ -51,7 +51,53 @@ app.post("/api/config", async (req, res) => {
             throw new Error(`Failed to fetch models: ${r.status} ${await r.text()}`);
         }
 
-        await updateConfig(baseUrl, apiKey, tavilyApiKey, searxngBaseUrl, searxngPort);
+        await updateConfig(baseUrl, apiKey, tavilyApiKey, searchEngine, searxngBaseUrl, searxngPort);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+});
+
+app.post("/api/test/llm", async (req, res) => {
+    try {
+        const { baseUrl, apiKey } = req.body;
+        if (!baseUrl || !apiKey) return res.status(400).json({ success: false, error: "Missing parameters" });
+        const r = await fetch(baseUrl + "/v1/models", {
+            headers: { Authorization: `Bearer ${apiKey}` }
+        });
+        if (!r.ok) throw new Error(`API returned ${r.status}`);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+});
+
+app.post("/api/test/tavily", async (req, res) => {
+    try {
+        const { apiKey } = req.body;
+        if (!apiKey) return res.status(400).json({ success: false, error: "Missing API Key" });
+        const r = await fetch("https://api.tavily.com/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ api_key: apiKey, query: "test", max_results: 1 })
+        });
+        if (!r.ok) throw new Error(`API returned ${r.status}`);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+});
+
+app.post("/api/test/searxng", async (req, res) => {
+    try {
+        const { baseUrl, port } = req.body;
+        if (!baseUrl) return res.status(400).json({ success: false, error: "Missing Base URL" });
+        const url = new URL(baseUrl);
+        if (port) url.port = port;
+        url.pathname = "/search";
+        url.search = "?q=test&format=json";
+        const r = await fetch(url.toString());
+        if (!r.ok) throw new Error(`API returned ${r.status}`);
         res.json({ success: true });
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });

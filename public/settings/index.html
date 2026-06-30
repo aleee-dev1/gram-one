@@ -163,6 +163,121 @@
         .dark .del-btn:hover {
             background-color: rgba(229, 62, 62, 0.2) !important;
         }
+
+        .input-base {
+            background: #ffffff;
+            border: 1px solid #d2d6da;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            color: #1a1a1a;
+            outline: none;
+            transition: all .2s;
+        }
+
+        .dark .input-base {
+            background: #1a1a1a;
+            border-color: #333;
+            color: #e0e0e0;
+        }
+
+        .input-base::placeholder {
+            color: #adb5bd;
+        }
+
+        .dark .input-base::placeholder {
+            color: #777;
+        }
+
+        .input-base:focus {
+            border-color: #2b6cb0;
+            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
+        }
+
+        .dark .input-base:focus {
+            border-color: #4f8ef7;
+        }
+
+        .field-desc {
+            font-size: 12px;
+            color: #adb5bd;
+        }
+
+        .dark .field-desc {
+            color: #777;
+        }
+
+        .test-field-btn {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #d2d6da;
+            color: #6c757d;
+            transition: all .15s;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .dark .test-field-btn {
+            border-color: #333;
+            color: #a0a0a0;
+        }
+
+        .test-field-btn:hover:not(:disabled) {
+            border-color: #2b6cb0;
+            color: #2b6cb0;
+        }
+
+        .dark .test-field-btn:hover:not(:disabled) {
+            border-color: #4f8ef7;
+            color: #4f8ef7;
+        }
+
+        .test-field-btn:disabled {
+            opacity: .6;
+            cursor: default;
+        }
+
+        .pw-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #adb5bd;
+            padding: 0 4px;
+            font-size: 14px;
+        }
+
+        .dark .pw-toggle-btn {
+            color: #777;
+        }
+
+        .pw-toggle-btn:hover {
+            color: #6c757d;
+        }
+
+        .dark .pw-toggle-btn:hover {
+            color: #a0a0a0;
+        }
+
+        .warning-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 12.5px;
+            line-height: 1.5;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .dark .warning-box {
+            background: rgba(120, 53, 15, 0.2);
+            border-color: #78350f;
+            color: #fcd34d;
+        }
     </style>
 </head>
 
@@ -267,8 +382,7 @@
                             <label
                                 class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Profile
                                 Name</label>
-                            <input id="profile-name" type="text" placeholder="e.g. Code Assistant"
-                                class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]" />
+                            <input id="profile-name" type="text" placeholder="e.g. Code Assistant" class="input-base" />
                         </div>
 
                         <div class="flex flex-col gap-[8px] flex-1">
@@ -276,7 +390,7 @@
                                 class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">System
                                 Prompt</label>
                             <textarea id="profile-prompt" placeholder="You are a helpful assistant..."
-                                class="flex-1 min-h-[240px] resize-none bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)] leading-[1.6]"></textarea>
+                                class="input-base flex-1 min-h-[240px] resize-none leading-[1.6]"></textarea>
                         </div>
 
                         <div class="flex items-center gap-[16px]">
@@ -308,15 +422,13 @@
                             <span
                                 class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">LLM
                                 Provider</span>
-                            <p class="text-[12px] text-[#adb5bd] dark:text-[#777]">Endpoint and key for your model
-                                provider (OpenAI-compatible API).</p>
+                            <p class="field-desc">Endpoint and key for your model provider (OpenAI-compatible API).</p>
                         </div>
                         <div class="flex flex-col gap-[8px]">
                             <label for="llmBaseUrl"
                                 class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Base
                                 URL</label>
-                            <input type="url" id="llmBaseUrl" name="llmBaseUrl" required
-                                class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
+                            <input type="url" id="llmBaseUrl" name="llmBaseUrl" required class="input-base"
                                 placeholder="https://api.mistral.ai">
                         </div>
                         <div class="flex flex-col gap-[8px]">
@@ -324,12 +436,14 @@
                                 class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">API
                                 Key</label>
                             <div class="flex items-center gap-[10px]">
-                                <input type="password" id="llmApiKey" name="llmApiKey" required
-                                    class="flex-1 bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
-                                    placeholder="Enter your API key">
-                                <button type="button"
-                                    class="test-field-btn shrink-0 text-[12px] font-medium px-[14px] py-[10px] rounded-[8px] border border-[#d2d6da] dark:border-[#333] text-[#6c757d] dark:text-[#a0a0a0] hover:border-[#2b6cb0] hover:text-[#2b6cb0] dark:hover:border-[#4f8ef7] dark:hover:text-[#4f8ef7] transition-all duration-150"
-                                    data-target="llm">Test</button>
+                                <div class="flex-1 flex items-center input-base !py-0 pr-[8px]">
+                                    <input type="password" id="llmApiKey" name="llmApiKey" required
+                                        class="flex-1 bg-transparent border-none outline-none py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] placeholder:text-[#adb5bd] dark:placeholder:text-[#777]"
+                                        placeholder="Enter your API key">
+                                    <button type="button" class="pw-toggle-btn" data-target="llmApiKey"
+                                        title="Show/Hide"><i class="fa-solid fa-eye"></i></button>
+                                </div>
+                                <button type="button" class="test-field-btn shrink-0" data-target="llm">Test</button>
                             </div>
                         </div>
 
@@ -340,51 +454,67 @@
                             <span
                                 class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Web
                                 Search (Tavily)</span>
-                            <p class="text-[12px] text-[#adb5bd] dark:text-[#777]">Used by the Web MCP tool for live
-                                search results.</p>
+                            <p class="field-desc">Used by the Web MCP tool getting page content</p>
                         </div>
                         <div class="flex flex-col gap-[8px]">
                             <label for="tavilyApiKey"
                                 class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Tavily
                                 API Key</label>
                             <div class="flex items-center gap-[10px]">
-                                <input type="password" id="tavilyApiKey" name="tavilyApiKey"
-                                    class="flex-1 bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
-                                    placeholder="Enter your Tavily API key">
-                                <button type="button"
-                                    class="test-field-btn shrink-0 text-[12px] font-medium px-[14px] py-[10px] rounded-[8px] border border-[#d2d6da] dark:border-[#333] text-[#6c757d] dark:text-[#a0a0a0] hover:border-[#2b6cb0] hover:text-[#2b6cb0] dark:hover:border-[#4f8ef7] dark:hover:text-[#4f8ef7] transition-all duration-150"
-                                    data-target="tavily">Test</button>
+                                <div class="flex-1 flex items-center input-base !py-0 pr-[8px]">
+                                    <input type="password" id="tavilyApiKey" name="tavilyApiKey"
+                                        class="flex-1 bg-transparent border-none outline-none py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] placeholder:text-[#adb5bd] dark:placeholder:text-[#777]"
+                                        placeholder="Enter your Tavily API key">
+                                    <button type="button" class="pw-toggle-btn" data-target="tavilyApiKey"
+                                        title="Show/Hide"><i class="fa-solid fa-eye"></i></button>
+                                </div>
+                                <button type="button" class="test-field-btn shrink-0" data-target="tavily">Test</button>
                             </div>
                         </div>
 
                         <div class="w-full h-px bg-[#eef0f2] dark:bg-[#2a2a2a]"></div>
 
-                        <!-- SearxNG -->
+                        <!-- Search Engine -->
                         <div class="flex flex-col gap-[4px]">
                             <span
-                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">SearxNG</span>
-                            <p class="text-[12px] text-[#adb5bd] dark:text-[#777]">Self-hosted metasearch instance, used
-                                as a fallback/alternate search source.</p>
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Search
+                                Engine</span>
+                            <p class="field-desc">Backend used for fallback/alternate search when not using Tavily.</p>
                         </div>
-                        <div class="flex items-end gap-[10px]">
+                        <div class="flex flex-col gap-[8px]">
+                            <label for="searchEngine"
+                                class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Engine</label>
+                            <select id="searchEngine" name="searchEngine" class="input-base">
+                                <option value="ddg">DuckDuckGo (raw scrape via Cheerio)</option>
+                                <option value="searxng">SearxNG (self-hosted)</option>
+                            </select>
+                        </div>
+
+                        <!-- DDG warning -->
+                        <div id="ddgWarning" class="warning-box hidden">
+                            <i class="fa-solid fa-triangle-exclamation mt-[2px]"></i>
+                            <span>Raw DDG scraping via Cheerio has no official API contract — it parses DuckDuckGo's
+                                HTML directly. It works today but <strong>will silently break</strong> whenever
+                                DuckDuckGo changes their markup/schema, with no advance notice. Expect occasional
+                                patches to the scraper. Use SearxNG for a stable, self-hosted alternative.</span>
+                        </div>
+
+                        <!-- SearxNG fields -->
+                        <div id="searxngFields" class="hidden flex items-end gap-[10px]">
                             <div class="flex flex-col gap-[8px] flex-1">
                                 <label for="searxngBaseUrl"
                                     class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Base
                                     URL</label>
-                                <input type="url" id="searxngBaseUrl" name="searxngBaseUrl"
-                                    class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
+                                <input type="url" id="searxngBaseUrl" name="searxngBaseUrl" class="input-base"
                                     placeholder="http://localhost">
                             </div>
                             <div class="flex flex-col gap-[8px] w-[110px]">
                                 <label for="searxngPort"
                                     class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#a0a0a0] tracking-[0.5px]">Port</label>
-                                <input type="number" id="searxngPort" name="searxngPort"
-                                    class="bg-[#ffffff] dark:bg-[#1a1a1a] border border-[#d2d6da] dark:border-[#333] rounded-[8px] px-[16px] py-[10px] text-[14px] text-[#1a1a1a] dark:text-[#e0e0e0] outline-none transition-all duration-200 placeholder:text-[#adb5bd] dark:placeholder:text-[#777] focus:border-[#2b6cb0] dark:focus:border-[#4f8ef7] focus:shadow-[0_0_0_3px_rgba(43,108,176,0.1)]"
+                                <input type="number" id="searxngPort" name="searxngPort" class="input-base"
                                     placeholder="8080">
                             </div>
-                            <button type="button"
-                                class="test-field-btn shrink-0 text-[12px] font-medium px-[14px] py-[10px] rounded-[8px] border border-[#d2d6da] dark:border-[#333] text-[#6c757d] dark:text-[#a0a0a0] hover:border-[#2b6cb0] hover:text-[#2b6cb0] dark:hover:border-[#4f8ef7] dark:hover:text-[#4f8ef7] transition-all duration-150"
-                                data-target="searxng">Test</button>
+                            <button type="button" class="test-field-btn shrink-0" data-target="searxng">Test</button>
                         </div>
 
                         <div class="pt-[8px]">

@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { getConfig } from "../../modules/db.js";
 
-const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
 const TAVILY_BASE = "https://api.tavily.com";
 
 export async function searchKeywords(keywords, maxResults = 10) {
@@ -14,12 +14,19 @@ export async function searchKeywords(keywords, maxResults = 10) {
         throw new Error("maxResults must be between 1 and 10");
     }
 
+    const config = await getConfig();
+    const searchEngine = config?.search_engine || "ddg";
+
     let results = [];
 
-    try {
-        results = await searXNG(keywords);
-    } catch (err) {
-        console.log(err);
+    if (searchEngine === "searxng") {
+        try {
+            results = await searXNG(keywords, config);
+        } catch (err) {
+            console.log("SearXNG failed, falling back to DDG", err);
+            results = await rawSearch(keywords);
+        }
+    } else {
         results = await rawSearch(keywords);
     }
 
@@ -73,9 +80,18 @@ async function rawSearch(keywords) {
     return results;
 }
 
-async function searXNG(keywords) {
+async function searXNG(keywords, config) {
+    const baseUrl = config?.searxng_base_url || "http://localhost";
+    const port = config?.searxng_port || "8080";
 
-    const res = await fetch(`http://localhost:8080/search?q=${encodeURIComponent(keywords)}&format=json`);
+    let urlString = baseUrl;
+    if (!urlString.startsWith("http")) urlString = "http://" + urlString;
+    const url = new URL(urlString);
+    if (port) url.port = port;
+    url.pathname = "/search";
+    url.search = `?q=${encodeURIComponent(keywords)}&format=json`;
+
+    const res = await fetch(url.toString());
 
     if (!res.ok) {
         throw new Error(`SearXNG failed: ${res.status}`);
@@ -91,7 +107,7 @@ async function searXNG(keywords) {
             title: res.title,
             url: res.url,
             description: res.content,
-            score: +res.score.toFixed(2)
+            score: +(res.score || 0).toFixed(2)
         })
     }
 
@@ -99,12 +115,16 @@ async function searXNG(keywords) {
 }
 
 export async function scrape(url) {
+    const config = await getConfig();
+    const tavilyApiKey = config?.tavily_api_key || process.env.TAVILY_API_KEY;
+
+    if (!tavilyApiKey) throw new Error("Tavily API key is not configured");
 
     const res = await fetch(`${TAVILY_BASE}/extract`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            api_key: TAVILY_API_KEY,
+            api_key: tavilyApiKey,
             urls: [url],
             format: "text"
         })
@@ -119,4 +139,3 @@ export async function scrape(url) {
 
     return result.raw_content;
 }
-

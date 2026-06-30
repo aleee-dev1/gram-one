@@ -28,6 +28,9 @@ const configForm = document.getElementById("configForm");
 const llmBaseUrlInput = document.getElementById("llmBaseUrl");
 const llmApiKeyInput = document.getElementById("llmApiKey");
 const tavilyApiKeyInput = document.getElementById("tavilyApiKey");
+const searchEngineSelect = document.getElementById("searchEngine");
+const ddgWarning = document.getElementById("ddgWarning");
+const searxngFields = document.getElementById("searxngFields");
 const searxngBaseUrlInput = document.getElementById("searxngBaseUrl");
 const searxngPortInput = document.getElementById("searxngPort");
 const testBtn = document.getElementById("testBtn");
@@ -164,6 +167,19 @@ function showSaveMsg() {
 }
 
 // --- Config ---
+function applySearchEngineUI() {
+    const engine = searchEngineSelect.value;
+    if (engine === "ddg") {
+        ddgWarning.classList.remove("hidden");
+        searxngFields.classList.add("hidden");
+    } else {
+        ddgWarning.classList.add("hidden");
+        searxngFields.classList.remove("hidden");
+    }
+}
+
+searchEngineSelect.addEventListener("change", applySearchEngineUI);
+
 async function loadConfig() {
     try {
         const res = await fetch("/api/config");
@@ -172,11 +188,14 @@ async function loadConfig() {
             if (config.base_url) llmBaseUrlInput.value = config.base_url;
             if (config.api_key) llmApiKeyInput.value = config.api_key;
             if (config.tavily_api_key) tavilyApiKeyInput.value = config.tavily_api_key;
+            if (config.search_engine) searchEngineSelect.value = config.search_engine;
             if (config.searxng_base_url) searxngBaseUrlInput.value = config.searxng_base_url;
             if (config.searxng_port) searxngPortInput.value = config.searxng_port;
         }
     } catch (err) {
         console.error("Could not load config", err);
+    } finally {
+        applySearchEngineUI();
     }
 }
 
@@ -192,6 +211,7 @@ configForm.addEventListener("submit", async (e) => {
     const baseUrl = llmBaseUrlInput.value.trim();
     const apiKey = llmApiKeyInput.value.trim();
     const tavilyApiKey = tavilyApiKeyInput.value.trim();
+    const searchEngine = searchEngineSelect.value;
     const searxngBaseUrl = searxngBaseUrlInput.value.trim();
     const searxngPort = searxngPortInput.value.trim();
 
@@ -206,7 +226,7 @@ configForm.addEventListener("submit", async (e) => {
         const res = await fetch("/api/config", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ baseUrl, apiKey, tavilyApiKey, searxngBaseUrl, searxngPort })
+            body: JSON.stringify({ baseUrl, apiKey, tavilyApiKey, searchEngine, searxngBaseUrl, searxngPort })
         });
 
         const data = await res.json();
@@ -225,21 +245,67 @@ configForm.addEventListener("submit", async (e) => {
     }
 });
 
-// --- Per-field dummy test buttons ---
+// --- Per-field test buttons ---
 document.querySelectorAll(".test-field-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
+        const target = btn.dataset.target;
+        let url = "";
+        let body = {};
+
+        if (target === "llm") {
+            url = "/api/test/llm";
+            body = { baseUrl: llmBaseUrlInput.value.trim(), apiKey: llmApiKeyInput.value.trim() };
+        } else if (target === "tavily") {
+            url = "/api/test/tavily";
+            body = { apiKey: tavilyApiKeyInput.value.trim() };
+        } else if (target === "searxng") {
+            url = "/api/test/searxng";
+            body = { baseUrl: searxngBaseUrlInput.value.trim(), port: searxngPortInput.value.trim() };
+        }
+
         const original = btn.textContent;
         btn.textContent = "Testing...";
         btn.disabled = true;
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            
+            if (res.ok && data.success) {
+                btn.textContent = "OK";
+                btn.classList.add("border-green-400", "text-green-600");
+            } else {
+                btn.textContent = "Failed";
+                btn.classList.add("border-red-400", "text-red-600");
+                console.error("Test failed:", data.error);
+            }
+        } catch (err) {
+            btn.textContent = "Failed";
+            btn.classList.add("border-red-400", "text-red-600");
+            console.error("Test error:", err);
+        }
+
         setTimeout(() => {
-            btn.textContent = "OK";
-            btn.classList.add("border-green-400", "text-green-600");
-            setTimeout(() => {
-                btn.textContent = original;
-                btn.disabled = false;
-                btn.classList.remove("border-green-400", "text-green-600");
-            }, 1500);
-        }, 800);
+            btn.textContent = original;
+            btn.disabled = false;
+            btn.classList.remove("border-green-400", "text-green-600", "border-red-400", "text-red-600");
+        }, 2000);
+    });
+});
+
+// --- Password show/hide toggles ---
+document.querySelectorAll(".pw-toggle-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const input = document.getElementById(btn.dataset.target);
+        const icon = btn.querySelector("i");
+        const isHidden = input.type === "password";
+        input.type = isHidden ? "text" : "password";
+        icon.classList.toggle("fa-eye", !isHidden);
+        icon.classList.toggle("fa-eye-slash", isHidden);
     });
 });
 
