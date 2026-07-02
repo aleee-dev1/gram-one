@@ -298,14 +298,22 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
             });
             if (message?.trim()) apiMessages.push({ role: "user", content: message });
 
+            let baseSystemPrompt = "You are an AI assistant. You have access to multiple tools and system instructions to help the user.";
+            let profileSection = "";
+            let ragSection = "";
+
             if (conv?.profile_id) {
                 const profile = await getProfile(conv.profile_id);
-                if (profile) systemPrompt = profile.system_prompt;
+                if (profile && profile.system_prompt) {
+                    profileSection = `\n\n<behavior_profile>\n${profile.system_prompt}\n</behavior_profile>`;
+                }
             }
 
             if (ragContext) {
-                systemPrompt = systemPrompt ? `${systemPrompt}\n\n${ragContext}` : ragContext;
+                ragSection = `\n\n<retrieved_context>\n${ragContext}\n</retrieved_context>`;
             }
+
+            systemPrompt = `${baseSystemPrompt}${profileSection}${ragSection}`;
 
             mcpTools = await getTopTools(queryEmbedding, conv?.mcp_servers, 5);
         }

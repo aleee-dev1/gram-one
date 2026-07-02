@@ -107,6 +107,21 @@
             display: none !important;
         }
 
+        /* Right Sidebar Collapse Styles */
+        #right-sidebar {
+            transition: width 0.3s ease, min-width 0.3s ease, border-width 0.3s ease;
+        }
+
+        #right-sidebar.collapsed {
+            width: 0 !important;
+            min-width: 0 !important;
+            border-left-width: 0 !important;
+        }
+
+        #right-sidebar.collapsed > * {
+            display: none !important;
+        }
+
         /* Dropdown fade in */
         .dropdown-animate {
             animation: fadeInDown 0.15s ease-out forwards;
@@ -138,10 +153,8 @@
             <div id="sidebar-header"
                 class="flex items-center pt-[24px] pb-[16px] px-[20px] sidebar-px justify-between min-h-[70px]">
                 <div class="flex items-center gap-[10px] sidebar-hide overflow-hidden whitespace-nowrap">
-                    <!-- <i class="fa-solid fa-braille text-[#1a1a1a] dark:text-[#e0e0e0] text-[24px] shrink-0"></i> -->
                     <img src="/assets/logo.png" alt="Gram One Logo" class="w-[24px] h-[24px] shrink-0 object-contain" />
-                    <span class="text-[20px] font-bold text-[#1a1a1a] dark:text-[#e0e0e0] tracking-[-0.5px]">Gram
-                        One</span>
+                    <span class="text-[20px] font-bold text-[#1a1a1a] dark:text-[#e0e0e0] tracking-[-0.5px]">Gram One</span>
                 </div>
                 <button id="sidebar-toggle"
                     class="text-[#6c757d] dark:text-[#8b949e] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] transition-colors shrink-0 w-[24px] flex justify-center items-center"
@@ -181,36 +194,18 @@
 
             <!-- Bottom Settings Section -->
             <div
-                class="px-[20px] sidebar-px pt-[16px] pb-[20px] border-t border-[#eef0f2] dark:border-[#3d3d3d] bg-[#f0f0f0] dark:bg-[#1e1e1e] flex flex-col items-center">
-                <div
-                    class="text-[11px] font-semibold uppercase text-[#6c757d] dark:text-[#8b949e] tracking-[0.5px] mb-[8px] sidebar-hide w-full">
-                    Model
-                </div>
-                <div class="flex gap-[8px] items-center w-full sidebar-center">
-                    <!-- Model Select Wrapper -->
-                    <div
-                        class="fa-select-wrapper sidebar-hide relative flex-1 min-w-0 after:content-['\f078'] after:absolute after:right-[12px] after:top-1/2 after:-translate-y-1/2 after:pointer-events-none after:text-[11px] after:text-[#6c757d] dark:after:text-[#8b949e] after:transition-colors focus-within:after:text-[#1a1a1a] dark:focus-within:after:text-[#e0e0e0]">
-                        <select id="model-select"
-                            class="w-full appearance-none bg-[#ffffff] dark:bg-[#2f2f2f] border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[6px] py-[8px] pr-[30px] pl-[12px] font-sans text-[13px] text-[#1a1a1a] dark:text-[#e0e0e0] cursor-pointer outline-none transition-all duration-200 text-ellipsis whitespace-nowrap overflow-hidden hover:not(:disabled):border-[#adb5bd] dark:hover:not(:disabled):border-[#555] focus:border-[#1a1a1a] dark:focus:border-[#6c757d]"
-                            title="Select model">
-                            <option value="">Loading models...</option>
-                        </select>
-                    </div>
+                class="px-[20px] sidebar-px pt-[16px] pb-[20px] border-t border-[#eef0f2] dark:border-[#3d3d3d] bg-[#f0f0f0] dark:bg-[#1e1e1e] flex items-center justify-between">
+                <a href="/settings"
+                    class="sidebar-hide flex items-center justify-center w-[34px] h-[34px] rounded-[6px] text-[#6c757d] dark:text-[#8b949e] bg-transparent border border-transparent cursor-pointer transition-all duration-150 shrink-0 hover:bg-[#eef0f2] dark:hover:bg-[#2f2f2f] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0]"
+                    title="Settings">
+                    <i class="fa-solid fa-gear text-[16px]"></i>
+                </a>
 
-                    <!-- Settings Link Icon -->
-                    <a href="/settings"
-                        class="sidebar-hide flex items-center justify-center w-[34px] h-[34px] rounded-[6px] text-[#6c757d] dark:text-[#8b949e] bg-transparent border border-transparent cursor-pointer transition-all duration-150 shrink-0 hover:bg-[#eef0f2] dark:hover:bg-[#2f2f2f] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0]"
-                        title="Settings">
-                        <i class="fa-solid fa-gear text-[16px]"></i>
-                    </a>
-
-                    <!-- Theme Toggle -->
-                    <button id="theme-toggle"
-                        class="flex items-center justify-center w-[34px] h-[34px] rounded-[6px] text-[#6c757d] dark:text-[#8b949e] bg-transparent border border-transparent cursor-pointer transition-all duration-150 shrink-0 hover:bg-[#eef0f2] dark:hover:bg-[#2f2f2f] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0]"
-                        title="Toggle dark mode">
-                        <i class="fa-solid fa-moon text-[14px]"></i>
-                    </button>
-                </div>
+                <button id="theme-toggle"
+                    class="flex items-center justify-center w-[34px] h-[34px] rounded-[6px] text-[#6c757d] dark:text-[#8b949e] bg-transparent border border-transparent cursor-pointer transition-all duration-150 shrink-0 hover:bg-[#eef0f2] dark:hover:bg-[#2f2f2f] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0]"
+                    title="Toggle dark mode">
+                    <i class="fa-solid fa-moon text-[14px]"></i>
+                </button>
             </div>
         </aside>
 
@@ -279,42 +274,11 @@
                         <!-- Right Actions (Dropdowns & Send) -->
                         <div class="flex items-center gap-[12px]">
 
-                            <!-- Custom Profile Select Dropdown -->
-                            <div class="relative" id="profile-dropdown-container">
-                                <button id="profile-dropdown-btn"
-                                    class="flex items-center gap-[6px] text-[13px] text-[#6c757d] dark:text-[#8b949e] font-medium hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-                                    <span id="profile-dropdown-label">Profile</span>
-                                    <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                                </button>
-
-                                <div id="profile-dropdown-menu"
-                                    class="hidden absolute bottom-full right-0 mb-[16px] w-[180px] bg-[#ffffff] dark:bg-[#1e1e1e] border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[12px] shadow-[0_10px_25px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.5)] p-[6px] z-[100] dropdown-animate text-left">
-                                    <div id="profile-list" class="flex flex-col max-h-[300px] overflow-y-auto">
-                                        <!-- Profile items injected dynamically -->
-                                        <div class="px-3 py-2 text-xs text-gray-400">Loading profiles...</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Custom MCP Select Dropdown -->
-                            <div class="relative" id="mcp-dropdown-container">
-                                <button id="mcp-dropdown-btn"
-                                    class="flex items-center gap-[6px] text-[13px] text-[#6c757d] dark:text-[#8b949e] font-medium hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-                                    <i class="fa-solid fa-plug text-[12px]"></i> MCPs
-                                    <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                                </button>
-
-                                <div id="mcp-dropdown-menu"
-                                    class="hidden absolute bottom-full right-0 mb-[16px] w-[280px] bg-[#ffffff] dark:bg-[#1e1e1e] border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[12px] shadow-[0_10px_25px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.5)] p-[16px] z-[100] dropdown-animate text-left">
-                                    <div
-                                        class="text-[11px] font-semibold text-[#6c757d] dark:text-[#8b949e] mb-[16px] uppercase tracking-[0.5px]">
-                                        MCP Servers</div>
-                                    <div id="mcp-list"
-                                        class="flex flex-col gap-[16px] max-h-[400px] overflow-y-auto pr-[4px]">
-                                        <!-- MCP toggles injected here dynamically -->
-                                    </div>
-                                </div>
-                            </div>
+                            <button id="right-sidebar-toggle"
+                                class="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[#6c757d] dark:text-[#8b949e] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] hover:bg-[#eef0f2] dark:hover:bg-[#3d3d3d] transition-colors cursor-pointer"
+                                title="Toggle Settings">
+                                <i class="fa-solid fa-sliders text-[16px]"></i>
+                            </button>
 
                             <!-- Send Button -->
                             <button id="send-btn"
@@ -326,6 +290,60 @@
                 </div>
             </div>
         </main>
+
+        <!-- Right Sidebar -->
+        <aside id="right-sidebar" class="w-[280px] min-w-[280px] bg-[#f0f0f0] dark:bg-[#1e1e1e] border-l border-[#eef0f2] dark:border-[#3d3d3d] flex flex-col overflow-hidden collapsed">
+            <!-- Header -->
+            <div class="flex items-center justify-between pt-[24px] pb-[16px] px-[20px] min-h-[70px] border-b border-[#eef0f2] dark:border-[#3d3d3d]">
+                <span class="text-[16px] font-bold text-[#1a1a1a] dark:text-[#e0e0e0] tracking-[-0.5px]">Chat Settings</span>
+                <button id="right-sidebar-close" class="text-[#6c757d] dark:text-[#8b949e] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] transition-colors shrink-0 w-[24px] flex justify-center items-center">
+                    <i class="fa-solid fa-xmark text-[18px]"></i>
+                </button>
+            </div>
+            
+            <div class="p-[20px] flex flex-col gap-[24px] overflow-y-auto">
+                <!-- Model Section -->
+                <div>
+                    <div class="text-[11px] font-semibold text-[#6c757d] dark:text-[#8b949e] mb-[8px] uppercase tracking-[0.5px]">Model</div>
+                    <div class="fa-select-wrapper relative w-full after:content-['\f078'] after:absolute after:right-[12px] after:top-1/2 after:-translate-y-1/2 after:pointer-events-none after:text-[11px] after:text-[#6c757d] dark:after:text-[#8b949e] after:transition-colors focus-within:after:text-[#1a1a1a] dark:focus-within:after:text-[#e0e0e0]">
+                        <select id="model-select"
+                            class="w-full appearance-none bg-[#ffffff] dark:bg-[#2f2f2f] border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[6px] py-[8px] pr-[30px] pl-[12px] font-sans text-[13px] text-[#1a1a1a] dark:text-[#e0e0e0] cursor-pointer outline-none transition-all duration-200 text-ellipsis whitespace-nowrap overflow-hidden hover:not(:disabled):border-[#adb5bd] dark:hover:not(:disabled):border-[#555] focus:border-[#1a1a1a] dark:focus:border-[#6c757d]"
+                            title="Select model">
+                            <option value="">Loading models...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Profile Section -->
+                <div>
+                    <div class="text-[11px] font-semibold text-[#6c757d] dark:text-[#8b949e] mb-[8px] uppercase tracking-[0.5px]">Profile</div>
+                    <div class="relative w-full" id="profile-dropdown-container">
+                        <button id="profile-dropdown-btn" class="w-full flex items-center justify-between bg-[#ffffff] dark:bg-[#2f2f2f] border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[6px] py-[8px] px-[12px] text-[13px] text-[#1a1a1a] dark:text-[#e0e0e0] font-medium cursor-pointer transition-colors hover:border-[#adb5bd] dark:hover:border-[#555]">
+                            <span id="profile-dropdown-label" class="whitespace-nowrap overflow-hidden text-ellipsis mr-2">Profile</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-[#6c757d] dark:text-[#8b949e]"></i>
+                        </button>
+                        <div id="profile-dropdown-menu" class="hidden absolute top-full left-0 right-0 mt-[4px] bg-[#ffffff] dark:bg-[#1e1e1e] border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[8px] shadow-lg z-[100] dropdown-animate overflow-hidden">
+                            <div id="profile-list" class="flex flex-col max-h-[200px] overflow-y-auto">
+                                <div class="px-3 py-2 text-xs text-gray-400">Loading profiles...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MCP Section (Collapsible Box) -->
+                <div>
+                    <button id="mcp-collapse-btn" class="w-full flex items-center justify-between text-[11px] font-semibold text-[#6c757d] dark:text-[#8b949e] uppercase tracking-[0.5px] cursor-pointer hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] transition-colors mb-[8px]">
+                        <span>MCP Servers</span>
+                        <i class="fa-solid fa-chevron-up transition-transform" id="mcp-collapse-icon"></i>
+                    </button>
+                    <div id="mcp-collapse-content" class="bg-[#ffffff] dark:bg-[#2f2f2f] border border-[#eef0f2] dark:border-[#3d3d3d] rounded-[8px] p-[12px] overflow-hidden">
+                        <div id="mcp-list" class="flex flex-col gap-[12px] max-h-[300px] overflow-y-auto pr-[4px]">
+                            <!-- MCP toggles injected here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <!-- Delete Modal -->

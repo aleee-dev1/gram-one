@@ -176,7 +176,6 @@ function toggleChatUI(isChatting) {
 
 function updateMcpTogglesState() {
     const isNew = activeConvId === "new";
-    $("mcp-dropdown-btn").disabled = !isNew;
     document.querySelectorAll('.mcp-toggle-input').forEach(t => t.disabled = !isNew);
 }
 
@@ -430,21 +429,26 @@ $("theme-toggle").onclick = () => {
     localStorage.setItem("theme", isDark ? "dark" : "light");
 };
 
+$("right-sidebar-toggle").onclick = () => {
+    $("right-sidebar").classList.toggle("collapsed");
+};
+
+$("right-sidebar-close").onclick = () => {
+    $("right-sidebar").classList.add("collapsed");
+};
+
 $("profile-dropdown-btn").onclick = (e) => {
     e.stopPropagation();
     $("profile-dropdown-menu").classList.toggle("hidden");
-    $("mcp-dropdown-menu").classList.add("hidden");
 };
 
-$("mcp-dropdown-btn").onclick = (e) => {
-    e.stopPropagation();
-    $("mcp-dropdown-menu").classList.toggle("hidden");
-    $("profile-dropdown-menu").classList.add("hidden");
+$("mcp-collapse-btn").onclick = () => {
+    $("mcp-collapse-content").classList.toggle("hidden");
+    $("mcp-collapse-icon").classList.toggle("rotate-180");
 };
 
 document.onclick = (e) => {
     if (!e.target.closest('#profile-dropdown-btn') && !e.target.closest('#profile-dropdown-menu')) $("profile-dropdown-menu").classList.add("hidden");
-    if (!e.target.closest('#mcp-dropdown-btn') && !e.target.closest('#mcp-dropdown-menu')) $("mcp-dropdown-menu").classList.add("hidden");
 };
 
 $("send-btn").onclick = () => streaming ? abortController?.abort() : sendMessage();
