@@ -88,15 +88,6 @@ async function loadModels() {
 async function loadMcpServers() {
     try {
         mcpServersData = await api("/api/mcp-servers");
-        $("mcp-list").innerHTML = mcpServersData.map(s => `
-            <div class="flex items-center justify-between">
-                <span class="text-[13.5px] font-medium text-[#1a1a1a] dark:text-[#e0e0e0] mr-3 whitespace-normal leading-tight">${escapeHtml(s.name)}</span>
-                <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                    <input type="checkbox" value="${s.id}" class="sr-only peer mcp-toggle-input" checked>
-                    <div class="w-9 h-5 bg-[#d2d6da] dark:bg-[#444] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1a1a1a] dark:peer-checked:bg-[#e0e0e0] peer-disabled:opacity-50"></div>
-                </label>
-            </div>`).join('');
-        updateMcpTogglesState();
     } catch (e) { mcpServersData = []; }
 }
 
@@ -143,8 +134,7 @@ async function selectConversation(id, title, profileId, mcpServers) {
         renderProfiles();
     }
 
-    document.querySelectorAll('.mcp-toggle-input').forEach(t => t.checked = mcpServers?.includes(t.value));
-    updateMcpTogglesState();
+
     updateActiveConvUI();
 
     $("messages").innerHTML = "";
@@ -162,8 +152,7 @@ function setNewState() {
     $("messages").innerHTML = "";
     toggleChatUI(false);
     $("profile-dropdown-btn").disabled = false;
-    document.querySelectorAll('.mcp-toggle-input').forEach(t => t.checked = true);
-    updateMcpTogglesState();
+
     updateActiveConvUI();
 }
 
@@ -174,10 +163,7 @@ function toggleChatUI(isChatting) {
     $("chat-area").classList.toggle("justify-center", !isChatting);
 }
 
-function updateMcpTogglesState() {
-    const isNew = activeConvId === "new";
-    document.querySelectorAll('.mcp-toggle-input').forEach(t => t.disabled = !isNew);
-}
+
 
 /** --- MESSAGING --- **/
 function appendMessage(role, content = "", options = null) {
@@ -353,13 +339,11 @@ async function sendMessage({ text = "", isContinue = false } = {}) {
 
     if (activeConvId === "new") {
         const { id } = await api("/api/conversations", "POST", {
-            profile_id: selectedProfileId,
-            mcp_servers: Array.from(document.querySelectorAll('.mcp-toggle-input:checked')).map(t => t.value)
+            profile_id: selectedProfileId
         });
         activeConvId = id;
         renderConvItem({ id, title: "New Conversation", profile_id: selectedProfileId });
         toggleChatUI(true);
-        updateMcpTogglesState();
         updateActiveConvUI();
     }
 
@@ -375,7 +359,11 @@ async function sendMessage({ text = "", isContinue = false } = {}) {
     let fullContent = "", usage = null, errored = false;
 
     try {
-        const res = await api(`/api/conversations/${activeConvId}/chat`, "POST", { message: text, model: $("model-select").value, continue: isContinue }, abortController.signal);
+        const res = await api(`/api/conversations/${activeConvId}/chat`, "POST", { 
+            message: text, 
+            model: $("model-select").value, 
+            continue: isContinue
+        }, abortController.signal);
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let buf = "";
@@ -442,10 +430,7 @@ $("profile-dropdown-btn").onclick = (e) => {
     $("profile-dropdown-menu").classList.toggle("hidden");
 };
 
-$("mcp-collapse-btn").onclick = () => {
-    $("mcp-collapse-content").classList.toggle("hidden");
-    $("mcp-collapse-icon").classList.toggle("rotate-180");
-};
+
 
 document.onclick = (e) => {
     if (!e.target.closest('#profile-dropdown-btn') && !e.target.closest('#profile-dropdown-menu')) $("profile-dropdown-menu").classList.add("hidden");

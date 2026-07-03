@@ -45,11 +45,12 @@ export async function initDb() {
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         title TEXT NOT NULL DEFAULT 'New Conversation',
                         profile_id INTEGER REFERENCES profiles(id) ON DELETE SET NULL,
-                        mcp_servers TEXT,
                         created_at INTEGER NOT NULL DEFAULT (unixepoch()),
                         updated_at INTEGER NOT NULL DEFAULT (unixepoch())
                     )
                 `);
+
+                db.run("ALTER TABLE conversations DROP COLUMN mcp_servers", () => {});
 
                 db.run(`
                     CREATE TABLE IF NOT EXISTS messages (
@@ -74,9 +75,12 @@ export async function initDb() {
                 db.run(`
                     CREATE TABLE IF NOT EXISTS mcp_servers_meta (
                         server_name TEXT PRIMARY KEY,
-                        shasum TEXT
+                        shasum TEXT,
+                        enabled INTEGER DEFAULT 1
                     )
                 `);
+
+                db.run("ALTER TABLE mcp_servers_meta ADD COLUMN enabled INTEGER DEFAULT 1", () => {});
 
                 db.run(`
                     CREATE TABLE IF NOT EXISTS mcp_tools (
@@ -155,24 +159,20 @@ export function updateConfig(baseUrl, apiKey, tavilyApiKey, searchEngine, searxn
 
 // ── conversations ─────────────────────────────────────────────────────────────
 
-export function createConversation(profileId, mcpServers) {
-    const mcpServersJson = mcpServers ? JSON.stringify(mcpServers) : null;
+export function createConversation(profileId) {
     return new Promise((res, rej) =>
-        db.run("INSERT INTO conversations (profile_id, mcp_servers) VALUES (?, ?)", [profileId || null, mcpServersJson], function (err) {
+        db.run("INSERT INTO conversations (profile_id) VALUES (?)", [profileId || null], function (err) {
             err ? rej(err) : res(this.lastID);
         })
     );
 }
 
 export async function getConversations() {
-    const rows = await all("SELECT id, title, profile_id, mcp_servers, created_at, updated_at FROM conversations ORDER BY updated_at DESC");
-    return rows.map(r => { if (r.mcp_servers) r.mcp_servers = JSON.parse(r.mcp_servers); return r; });
+    return all("SELECT id, title, profile_id, created_at, updated_at FROM conversations ORDER BY updated_at DESC");
 }
 
 export async function getConversation(convId) {
-    const row = await get("SELECT id, title, profile_id, mcp_servers, created_at, updated_at FROM conversations WHERE id = ?", [convId]);
-    if (row?.mcp_servers) row.mcp_servers = JSON.parse(row.mcp_servers);
-    return row;
+    return get("SELECT id, title, profile_id, created_at, updated_at FROM conversations WHERE id = ?", [convId]);
 }
 
 export function updateConversationTitle(convId, title) {
@@ -307,7 +307,16 @@ export async function getMcpServerMeta(serverName) {
 }
 
 export async function updateMcpServerMeta(serverName, shasum) {
-    return run("INSERT OR REPLACE INTO mcp_servers_meta (server_name, shasum) VALUES (?, ?)", [serverName, shasum]);
+    return run("INSERT INTO mcp_servers_meta (server_name, shasum) VALUES (?, ?) ON CONFLICT(server_name) DO UPDATE SET shasum = excluded.shasum", [serverName, shasum]);
+}
+
+export function setMcpServerEnabled(serverName, enabled) {
+    return run("UPDATE mcp_servers_meta SET enabled = ? WHERE server_name = ?", [enabled ? 1 : 0, serverName]);
+}
+
+export async function getEnabledMcpServers() {
+    const rows = await all("SELECT server_name FROM mcp_servers_meta WHERE enabled = 1");
+    return rows.map(r => r.server_name);
 }
 
 export async function clearMcpTools(serverName) {

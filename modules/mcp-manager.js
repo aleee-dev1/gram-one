@@ -8,7 +8,8 @@ import {
     getMcpServerMeta,
     updateMcpServerMeta,
     clearMcpTools,
-    saveMcpTool
+    saveMcpTool,
+    getEnabledMcpServers
 } from "./db.js";
 import { embedText } from "./ai.js";
 
@@ -141,12 +142,14 @@ export async function initMcp() {
 }
 
 export async function getMcpServers() {
+    const enabledServers = await getEnabledMcpServers();
     return Object.keys(clients).map(id => ({
         id,
         name: id
             .split("-")
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")
+            .join(" "),
+        enabled: enabledServers.includes(id)
     }));
 }
 

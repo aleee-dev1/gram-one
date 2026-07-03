@@ -7,10 +7,12 @@ const themeToggle = document.getElementById("theme-toggle");
 // Tabs
 const tabProfiles = document.getElementById("tab-profiles");
 const tabConfig = document.getElementById("tab-config");
+const tabMcp = document.getElementById("tab-mcp");
 
 // Views
 const viewProfiles = document.getElementById("view-profiles");
 const viewConfig = document.getElementById("view-config");
+const viewMcp = document.getElementById("view-mcp");
 
 // Profiles View
 const profileList = document.getElementById("profile-list");
@@ -36,6 +38,9 @@ const searxngPortInput = document.getElementById("searxngPort");
 const testBtn = document.getElementById("testBtn");
 const statusMessage = document.getElementById("statusMessage");
 
+// MCP View
+const mcpSettingsList = document.getElementById("mcp-settings-list");
+
 // --- Theme ---
 themeToggle.addEventListener("click", () => {
     document.documentElement.classList.toggle("dark");
@@ -46,16 +51,30 @@ themeToggle.addEventListener("click", () => {
 tabProfiles.addEventListener("click", () => {
     tabProfiles.classList.add("active");
     tabConfig.classList.remove("active");
+    tabMcp.classList.remove("active");
     viewProfiles.classList.remove("hidden");
     viewConfig.classList.add("hidden");
+    viewMcp.classList.add("hidden");
 });
 
 tabConfig.addEventListener("click", () => {
     tabConfig.classList.add("active");
     tabProfiles.classList.remove("active");
+    tabMcp.classList.remove("active");
     viewConfig.classList.remove("hidden");
     viewProfiles.classList.add("hidden");
+    viewMcp.classList.add("hidden");
     loadConfig();
+});
+
+tabMcp.addEventListener("click", () => {
+    tabMcp.classList.add("active");
+    tabProfiles.classList.remove("active");
+    tabConfig.classList.remove("active");
+    viewMcp.classList.remove("hidden");
+    viewProfiles.classList.add("hidden");
+    viewConfig.classList.add("hidden");
+    loadMcpServersSettings();
 });
 
 // --- Profiles ---
@@ -308,6 +327,43 @@ document.querySelectorAll(".pw-toggle-btn").forEach(btn => {
         icon.classList.toggle("fa-eye-slash", isHidden);
     });
 });
+
+// --- MCP Servers ---
+let mcpServersData = [];
+
+function escapeHtml(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+async function loadMcpServersSettings() {
+    try {
+        const res = await fetch("/api/mcp-servers");
+        mcpServersData = await res.json();
+        
+        mcpSettingsList.innerHTML = mcpServersData.map(s => `
+            <div class="flex items-center justify-between bg-[#f8f9fa] dark:bg-[#1a1a1a] border border-[#eef0f2] dark:border-[#2a2a2a] p-[16px] rounded-[8px]">
+                <span class="text-[14px] font-medium text-[#1a1a1a] dark:text-[#e0e0e0] mr-3 whitespace-normal leading-tight">${escapeHtml(s.name)}</span>
+                <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input type="checkbox" value="${s.id}" class="sr-only peer mcp-toggle-input" ${s.enabled ? 'checked' : ''} onchange="toggleMcpServer('${s.id}', this.checked)">
+                    <div class="w-9 h-5 bg-[#d2d6da] dark:bg-[#444] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#2b6cb0] dark:peer-checked:bg-[#4f8ef7] peer-disabled:opacity-50"></div>
+                </label>
+            </div>`).join('');
+    } catch (e) {
+        mcpSettingsList.innerHTML = '<div class="text-red-500">Failed to load MCP servers</div>';
+    }
+}
+
+window.toggleMcpServer = async (id, checked) => {
+    try {
+        await fetch(`/api/mcp-servers/${id}/toggle`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ enabled: checked })
+        });
+    } catch(e) {
+        console.error("Failed to toggle MCP server", e);
+    }
+};
 
 // Initialize
 loadProfiles();

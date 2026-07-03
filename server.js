@@ -7,7 +7,7 @@ import {
     getRelevantMessages, updateConversationTitle,
     getProfiles, createProfile, updateProfile, deleteProfile,
     getConversations, createConversation, deleteConversation, getTopTools,
-    getConfig, updateConfig
+    getConfig, updateConfig, getEnabledMcpServers, setMcpServerEnabled
 } from "./modules/db.js";
 import { initMcp, getTools, executeTool, getMcpServers } from "./modules/mcp-manager.js";
 
@@ -187,6 +187,16 @@ app.get("/api/mcp-servers", async (req, res) => {
     }
 });
 
+app.put("/api/mcp-servers/:id/toggle", async (req, res) => {
+    try {
+        const { enabled } = req.body;
+        await setMcpServerEnabled(req.params.id, enabled);
+        res.json({ ok: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // --- Conversations ---
 app.get("/api/conversations", async (req, res) => {
     try {
@@ -199,8 +209,8 @@ app.get("/api/conversations", async (req, res) => {
 
 app.post("/api/conversations", async (req, res) => {
     try {
-        const { profile_id, mcp_servers } = req.body || {};
-        const id = await createConversation(profile_id, mcp_servers);
+        const { profile_id } = req.body || {};
+        const id = await createConversation(profile_id);
         res.json({ id });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -315,7 +325,8 @@ app.post("/api/conversations/:id/chat", async (req, res) => {
 
             systemPrompt = `${baseSystemPrompt}${profileSection}${ragSection}`;
 
-            mcpTools = await getTopTools(queryEmbedding, conv?.mcp_servers, 5);
+            const enabledServers = await getEnabledMcpServers();
+            mcpTools = await getTopTools(queryEmbedding, enabledServers, 5);
         }
 
         let aborted = false;

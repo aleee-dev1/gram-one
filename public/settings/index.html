@@ -323,6 +323,11 @@
                     <i class="fa-solid fa-microchip w-[16px] text-center text-[14px]"></i>
                     <span>Config</span>
                 </button>
+                <button id="tab-mcp"
+                    class="settings-tab flex items-center gap-[10px] px-[12px] py-[10px] rounded-[8px] text-[13px] text-[#6c757d] dark:text-[#a0a0a0] hover:text-[#1a1a1a] dark:hover:text-[#e0e0e0] hover:bg-[#eef0f2] dark:hover:bg-[#2a2a2a] w-full text-left">
+                    <i class="fa-solid fa-server w-[16px] text-center text-[14px]"></i>
+                    <span>MCP</span>
+                </button>
             </div>
 
             <!-- Theme toggle -->
@@ -524,6 +529,22 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- MCP VIEW -->
+            <div id="view-mcp" class="hidden flex-1 flex-col overflow-y-auto">
+                <div
+                    class="flex items-center px-[32px] py-[20px] border-b border-[#eef0f2] dark:border-[#2a2a2a] min-h-[70px]">
+                    <span class="text-[16px] font-semibold text-[#1a1a1a] dark:text-[#e0e0e0]">MCP Servers</span>
+                </div>
+
+                <div class="p-[32px] max-w-[720px] w-full">
+                    <p class="text-[14px] text-[#6c757d] dark:text-[#a0a0a0] mb-[24px]">Select which MCP servers should be enabled for new conversations.</p>
+                    
+                    <div id="mcp-settings-list" class="flex flex-col gap-[16px]">
+                        <!-- MCP toggles injected here dynamically -->
+                    </div>
                 </div>
             </div>
 
